@@ -1,0 +1,7 @@
+# vim: set ft=yaml ts=2 expandtab:
+---
+
+key_type: RSA
+key_size: 2048
+
+...

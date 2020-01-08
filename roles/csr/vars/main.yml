@@ -1,0 +1,15 @@
+# vim: set ft=yaml ts=2 expandtab:
+---
+openssl_extended_key_usages:
+- serverAuth
+- clientAuth
+- codeSigning
+- emailProtection
+- timeStamping
+- msCodeInd
+- msCodeCom
+- msCTLSign
+- msSGC
+- msEFS
+- nsSGC
+...

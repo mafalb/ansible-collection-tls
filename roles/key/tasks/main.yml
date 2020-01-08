@@ -1,0 +1,25 @@
+# vim: set ft=yaml ts=2 expandtab:
+---
+
+- name: assertions
+  assert:
+    that:
+    - key_dir is defined
+    - alias is defined
+    - key_size is defined
+    - key_type in ['RSA']
+
+- name: directory for key does exist
+  file:
+    path: "{{ key_dir }}"
+    state: directory
+    recurse: true
+    mode: 00700
+
+- name: create key
+  openssl_privatekey:
+    path: "{{ key_dir }}/{{ alias }}.key"
+    size: "{{ key_size }}"
+    type: "{{ key_type }}"
+
+...

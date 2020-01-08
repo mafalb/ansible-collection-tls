@@ -1,0 +1,73 @@
+# vim: set ft=yaml ts=2 expandtab:
+---
+
+- name: assertions
+  assert:
+    that:
+    - key_file is defined
+    - csr_dir is defined
+    - alias is defined
+
+- name: assert that certificate info is present
+  assert:
+    that:
+    - x509_cn is present
+    - x509_organization is present
+    - x509_locality is present
+    - x509_province is present
+    - x509_country is present
+
+- name: check x509_sans
+  when: x509_sans is defined
+  block:
+
+  - assert:
+      that:
+      - x509_sans|type_debug == 'list'
+
+  - name: check x509_sans
+    with_items: "{{ x509_sans }}"
+    assert:
+      that:
+      - x509_cn != item
+
+- name: assertions for x509_extended_key_usage
+  when: x509_extended_key_usage is defined
+  block:
+
+  - name: x509_extended_key_usage is a list
+    assert:
+      that:
+      - x509_extended_key_usage|type_debug == 'list'
+
+  - name: x509_extended_key_usage is valid
+    with_items: "{{ x509_extended_key_usage }}"
+    assert:
+      that:
+      - item in openssl_extended_key_usages
+
+- name: directory for csr does exist
+  file:
+    path: "{{ csr_dir }}"
+    state: directory
+    recurse: true
+
+- name: CSR config is present
+  with_first_found:
+    - "{{ csr_config_file|default(omit) }}"
+    - csr.cnf.j2
+  template:
+    src: "{{ item }}"
+    dest: "{{ csr_dir }}/{{ alias }}.cnf"
+
+- name: CSR is present (existing will be overwritten)
+  when: csr_overwrite is defined
+  command: openssl req -new -utf8 -key {{ key_file }} -out {{ csr_dir }}/{{ alias }}.csr -config {{ csr_dir }}/{{ alias }}.cnf
+
+- name: CSR is present
+  when: csr_overwrite is not defined
+  command: openssl req -new -utf8 -key {{ key_file }} -out {{ csr_dir }}/{{ alias }}.csr -config {{ csr_dir }}/{{ alias }}.cnf
+  args:
+    creates: "{{ csr_dir }}/{{ alias }}.csr"
+
+...

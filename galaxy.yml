@@ -1,0 +1,32 @@
+# vim: set ft=yaml ts=2 expandtab:
+---
+namespace: mafalb
+name: tls
+version: 0.0.1
+
+readme: README.md
+
+authors:
+- Markus Falb <markus.falb@mafalb.at>
+
+description: Ansible collection for TLS - certificates,keys,CSRs
+
+license_file: 'LICENSE'
+
+tags:
+- tls
+- certificate
+- key
+- CSR
+- pem
+- openssl
+
+# The URL to any online docs
+documentation: https://github.com/mafalb/ansible-collection-tls
+
+# The URL to the homepage of the collection/project
+homepage: https://github.com/mafalb/ansible-collection-tls
+
+# The URL to the collection issue tracker
+issues: https://github.com/mafalb/ansible-collection-tls/issues
+...
