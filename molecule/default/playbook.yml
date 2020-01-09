@@ -10,5 +10,6 @@
   roles:
   - role: mafalb.tls.key
     key_dir: /tmp/testkey1
+    alias: testkey1.example.com
 
 ...
