@@ -1,0 +1,26 @@
+---
+- name: certificate for {{ alias }} is absent
+  file:
+    path: "{{ x509.certdir }}/{{ alias }}.cert"
+    state: absent
+
+- name: root certificate for {{ alias }} is absent
+  file:
+    path: "{{ x509.certdir }}/{{ alias }}.root.cert"
+    state: absent
+
+- name: key for {{ alias }} is absent
+  file:
+    path: "{{ x509.keydir }}/{{ alias }}.key"
+    state: absent
+
+- name: pem for {{ alias }} is absent
+  file:
+    path: "{{ x509.keydir }}/{{ alias }}.pem"
+    state: absent
+
+- name: chain file for {{ alias }} is absent
+  file:
+    path: "{{ x509.certdir }}/{{ alias }}.chain.pem"
+    state: absent
+...
