@@ -30,6 +30,8 @@ Role for creating a CSR
 
 ```key_file``` the private key used
 
+```csr_overwrite```
+
 ## Variables for certificate Information
 
 ```x509_cn```
