@@ -1,21 +1,25 @@
 # vim: set ft=yaml ts=2 expandtab:
 ---
 
+- name: OS specific variables
+  include_vars:
+      file: "{{ ansible_os_family }}.yml"
+
 - name: assertions
   assert:
     that:
-    - key_file is defined
-    - csr_dir is defined
+    - key_file|default(tls_default_private_dir) is defined
+    - csr_dir|default(tls_default_cert_dir) is defined
     - alias is defined
 
 - name: assert that certificate info is present
   assert:
     that:
-    - x509_cn is present
-    - x509_organization is present
-    - x509_locality is present
-    - x509_province is present
-    - x509_country is present
+    - x509_cn is defined
+    - x509_organization is defined
+    - x509_locality is defined
+    - x509_province is defined
+    - x509_country is defined
 
 - name: check x509_sans
   when: x509_sans is defined
@@ -47,8 +51,10 @@
       - item in openssl_extended_key_usages
 
 - name: directory for csr does exist
+  when:
+  - csr_dir is defined or alias|dirname != ""
   file:
-    path: "{{ csr_dir }}"
+    path: "{{ csr_dir|default(tls_default_cert_dir) }}/{{ alias|dirname }}"
     state: directory
     recurse: true
 
@@ -58,16 +64,16 @@
     - csr.cnf.j2
   template:
     src: "{{ item }}"
-    dest: "{{ csr_dir }}/{{ alias }}.cnf"
+    dest: "{{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.cnf"
 
 - name: CSR is present (existing will be overwritten)
   when: csr_overwrite is defined
-  command: openssl req -new -utf8 -key {{ key_file }} -out {{ csr_dir }}/{{ alias }}.csr -config {{ csr_dir }}/{{ alias }}.cnf
+  command: openssl req -new -utf8 -key {{ key_file|default(tls_default_private_dir + '/' + alias + '.key') }} -out {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr -config {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.cnf
 
 - name: CSR is present
   when: csr_overwrite is not defined
-  command: openssl req -new -utf8 -key {{ key_file }} -out {{ csr_dir }}/{{ alias }}.csr -config {{ csr_dir }}/{{ alias }}.cnf
+  command: openssl req -new -utf8 -key {{ key_file|default(tls_default_private_dir + '/' + alias + '.key') }} -out {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr -config {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.cnf
   args:
-    creates: "{{ csr_dir }}/{{ alias }}.csr"
+    creates: "{{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr"
 
 ...

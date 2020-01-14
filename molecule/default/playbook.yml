@@ -8,8 +8,27 @@
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
     no_proxy: "{{ lookup('env', 'no_proxy') }}"
   roles:
+
   - role: mafalb.tls.key
-    key_dir: /tmp/testkey1
-    alias: testkey1.example.com
+    alias: test1.example.com-20200114
+  - role: mafalb.tls.csr
+    alias: test1.example.com-20200114
+    x509_cn: test1.example.com
+    x509_organization: bla
+    x509_locality: Vienna
+    x509_province: Vienna
+    x509_country: AT
+    x509_sans:
+    - example.com
+
+  - role: mafalb.tls.key
+    alias: test2.example.com-20200114
+  - role: mafalb.tls.csr
+    alias: test2.example.com-20200114
+    x509_cn: test2.example.com
+    x509_organization: bla
+    x509_locality: Vienna
+    x509_province: Vienna
+    x509_country: AT
 
 ...

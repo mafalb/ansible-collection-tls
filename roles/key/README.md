@@ -17,9 +17,15 @@ Role for creating a private TLS key.
 
 ## Variables
 
-```key_dir``` the directory where the key is saved
+```key_dir```
 
-```alias``` the generated key is stored at ```{{ key_dir }}/{{ alias }}.key```
+The directory where the key is saved.
+Defaults to system specific value, e.g. /etc/pki/tls/private on RedHat.
+
+```alias```
+
+the generated key is stored at ```{{ key_dir }}/{{ alias }}.key```
+you can specify alias with subdirectories.
 
 ```key_size``` 
 

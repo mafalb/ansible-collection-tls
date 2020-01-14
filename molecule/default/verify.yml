@@ -3,9 +3,45 @@
 
 - name: Verify
   hosts: all
+
+  vars:
+    __default_private_dir:
+      Debian: /etc/ssl/private
+      RedHat: /etc/pki/tls/private
+    __default_cert_dir:
+      Debian: /etc/ssl/certs
+      RedHat: /etc/pki/tls/certs
+
   tasks:
-  - name: Example assertion
+
+  - name: get modulus for test1.example.com CSR
+    command: openssl req -modulus -in {{ __default_cert_dir[ansible_os_family] }}/test1.example.com-20200114.csr -noout
+    register: _csr_modulus_test1
+    changed_when: false
+
+  - name: get modulus of test1.example.com key
+    command: openssl rsa -modulus -in {{ __default_private_dir[ansible_os_family] }}/test1.example.com-20200114.key  -noout
+    register: _key_modulus_test1
+    changed_when: false
+
+  - name: Assertions test1.example.com
     assert:
-      that: true
+      that:
+      - _csr_modulus_test1.stdout == _key_modulus_test1.stdout
+
+  - name: get modulus of test2.example.com CSR
+    command: openssl req -modulus -in {{ __default_cert_dir[ansible_os_family] }}/test2.example.com-20200114.csr -noout
+    register: _csr_modulus_test2
+    changed_when: false
+
+  - name: get modulus of test2.example.com key
+    command: openssl rsa -modulus -in {{ __default_private_dir[ansible_os_family] }}/test2.example.com-20200114.key  -noout
+    register: _key_modulus_test2
+    changed_when: false
+
+  - name: Assertions test1.example.com
+    assert:
+      that:
+      - _csr_modulus_test2.stdout == _key_modulus_test2.stdout
 
 ...
