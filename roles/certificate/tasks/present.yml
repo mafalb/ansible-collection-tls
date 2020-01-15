@@ -1,0 +1,119 @@
+# vim: set ft=yaml ts=2 expandtab:
+---
+
+- name: assertions
+  assert:
+    that:
+      - chain|type_debug == 'list'
+      - root|type_debug == 'list'
+      - cert is defined
+      - alias is defined
+      - key is defined
+
+- name: "{{ alias }}.cert is present"
+  copy:
+    src: "{{ playbook_dir }}/{{ cert }}"
+    dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.cert"
+    mode: 00644
+    backup: true
+  notify: check for changed cert
+
+- block:
+
+  - name: CA certificates for {{ alias }} does exist
+    loop: "{{ root }}"
+    copy:
+      src: "{{ playbook_dir }}/{{ item }}"
+      dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.root{{ i + 1 }}.cert"
+      backup: true
+    loop_control:
+      index_var: i
+  
+  - name: "{{ alias }}.root.pem is present"
+    template:
+      src: root.j2
+      dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.root.pem"
+      backup: true
+
+  - name: "{{ alias }}.root.cert is absent"
+    file:
+      path: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.root.cert"
+      state: absent
+
+- debug: var=key
+  no_log: true
+  tags:
+  - never
+  - debug
+
+- name: "{{ alias }}.key is present"
+  block:
+
+  - name: key does exist
+    copy:
+      src: "{{ private_dir|default(tls_default_private_dir) }}/{{ key }}"
+      dest: "{{ private_dir|default(tls_default_private_dir) }}/{{ alias }}.key"
+      remote_src: true
+      backup: true
+      mode: "{{ tls_key_mode }}"
+    notify: check for changed key
+
+  - name: read in key
+    no_log: true
+    command: cat "{{ private_dir|default(tls_default_private_dir) }}/{{ key }}"
+    check_mode: false
+    changed_when: false
+    register: __key
+
+- name: "{{ alias }}.pem is present"
+  no_log: true
+  template:
+    src: pem.j2
+    dest: "{{ private_dir|default(tls_default_private_dir) }}/{{ alias }}.pem"
+    mode: "{{ tls_key_mode }}"
+    backup: true
+  notify: check for changed private pem
+
+- name: "{{ alias }}.chain.pem is present"
+  template:
+    src: chain.j2
+    dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.chain.pem"
+    mode: 0644
+    backup: true
+  notify: check for changed chain
+
+- name: cert matches key for {{ alias }}
+  block:
+
+  - name: get modulus of cert for {{ alias }}
+    command: openssl x509 -modulus -in {{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.cert -noout
+    register: _cert_modulus
+    changed_when: false
+    check_mode: false
+  
+  - name: get modulus of key for {{ alias }}
+    command: openssl rsa -modulus -in {{ private_dir|default(tls_default_private_dir + '/' + alias + '.key') }}  -noout
+    register: _key_modulus
+    changed_when: false
+    check_mode: false
+  
+  - name: assertions
+    assert:
+      that:
+      - _cert_modulus.stdout == _key_modulus.stdout
+
+- name: verify cert for {{ alias }}
+  block:
+
+  - name: openssl verify for {{ alias }}
+    command: openssl verify -CAfile {{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.root.pem -untrusted {{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.chain.pem {{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.cert
+    register: _cert_verify
+    check_mode: false
+    changed_when: false
+
+  - name: assertions
+    assert:
+      that:
+      - _cert_verify.rc == 0
+
+...

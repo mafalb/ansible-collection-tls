@@ -1,26 +1,40 @@
+# vim: set ft=yaml ts=2 expandtab:
 ---
-- name: certificate for {{ alias }} is absent
+
+- name: files for {{ alias }} are absent
+  loop:
+  - "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.cert"
+  - "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.chain.pem"
+  - "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.root.pem"
+  - "{{ private_dir|default(tls_default_private_dir) }}/{{ alias }}.key"
+  - "{{ private_dir|default(tls_default_private_dir) }}/{{ alias }}.pem }}"
+  - "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr"
+  - "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.cnf"
   file:
-    path: "{{ x509.certdir }}/{{ alias }}.cert"
+    path: "{{ item }}"
     state: absent
 
-- name: root certificate for {{ alias }} is absent
-  file:
-    path: "{{ x509.certdir }}/{{ alias }}.root.cert"
-    state: absent
+# the root certificates need special treating because
+# we dont know how many are present
+#
+- block:
 
-- name: key for {{ alias }} is absent
-  file:
-    path: "{{ x509.keydir }}/{{ alias }}.key"
-    state: absent
+  - name: find root certificates
+    find:
+      paths: "{{ cert_dir|default(tls_default_cert_dir) }}"
+      patterns: "{{ alias }}.root?.cert"
+    register: _files_to_delete
+  
+  - debug:
+      var: _files_to_delete
+    tags:
+    - never
+    - debug
 
-- name: pem for {{ alias }} is absent
-  file:
-    path: "{{ x509.keydir }}/{{ alias }}.pem"
-    state: absent
+  - name: root certificates are absent
+    loop: "{{ _files_to_delete.files }}"
+    file:
+      path: "{{ item.path }}"
+      state: absent
 
-- name: chain file for {{ alias }} is absent
-  file:
-    path: "{{ x509.certdir }}/{{ alias }}.chain.pem"
-    state: absent
 ...
