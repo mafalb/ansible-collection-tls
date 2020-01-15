@@ -41,7 +41,7 @@
     fetch:
       src: "{{ item }}"
       flat: true
-      dest: files/testca1
+      dest: files/testca1/{{ item|basename }}
 
   - name: deploy the certificate
     include_role:
