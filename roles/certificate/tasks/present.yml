@@ -12,7 +12,7 @@
 
 - name: "{{ alias }}.cert is present"
   copy:
-    src: "{{ playbook_dir }}/{{ cert }}"
+    src: "{{ cert }}"
     dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.cert"
     mode: 00644
     backup: true

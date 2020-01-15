@@ -1,0 +1,32 @@
+# vim: set ft=yaml ts=2 expandtab:
+---
+
+- name: OS specific variables
+  include_vars:
+      file: "{{ ansible_os_family }}.yml"
+
+- name: assertions
+  assert:
+    that:
+      - cert_dir|default(tls_default_cert_dir) is defined
+      - private_dir|default(tls_default_private_dir) is defined
+      - alias is defined
+
+- name: CA privatekey is present
+  include_role:
+    name: mafalb.tls.key
+
+- name: CA CSR is present
+  include_role:
+    name: mafalb.tls.csr
+  vars:
+    ca: true
+
+- name: CA certificate is present
+  openssl_certificate:
+    path: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.cert"
+    privatekey_path: "{{ private_dir|default(tls_default_private_dir) }}/{{ alias }}.key"
+    csr_path: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr"
+    provider: selfsigned
+
+...

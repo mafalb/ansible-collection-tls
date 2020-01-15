@@ -1,6 +1,7 @@
 # vim: set ft=yaml ts=2 expandtab:
 ---
 
+ca: false
 x509_extended_key_usage:
 - serverAuth
 

@@ -4,7 +4,11 @@ utf8                    = yes
 string_mask             = utf8only
 prompt                  = no
 distinguished_name      = server_dn             # DN template
+{% if ca|bool == True %}
+req_extensions          = ca_reqext         # Desired extensions
+{% else %}
 req_extensions          = server_reqext         # Desired extensions
+{% endif %}
 
 [ server_dn ]
 CN={{ x509_cn }}
@@ -12,6 +16,11 @@ O={{ x509_organization }}
 L={{ x509_locality }}
 ST={{ x509_province }}
 C={{ x509_country }}
+
+[ ca_reqext ]
+keyUsage                = critical,keyCertSign,cRLSign
+basicConstraints        = critical,CA:true
+subjectKeyIdentifier    = hash
 
 [ server_reqext ]
 basicConstraints = CA:FALSE
