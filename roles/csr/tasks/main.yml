@@ -80,19 +80,24 @@
   args:
     creates: "{{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr"
 
-- name: get modulus for test1.example.com CSR
-  command: openssl req -modulus -in {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr -noout
-  register: _csr_modulus
-  changed_when: false
+- name: CSR matches key
+  block:
 
-- name: get modulus of test1.example.com key
-  command: openssl rsa -modulus -in {{ key_file|default(tls_default_private_dir + '/' + alias + '.key') }}  -noout
-  register: _key_modulus
-  changed_when: false
-
-- name: Assertions
-  assert:
-    that:
-    - _csr_modulus.stdout == _key_modulus.stdout
+  - name: get modulus of CSR
+    command: openssl req -modulus -in {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr -noout
+    register: _csr_modulus
+    changed_when: false
+    check_mode: false
+  
+  - name: get modulus of test1.example.com key
+    command: openssl rsa -modulus -in {{ key_file|default(tls_default_private_dir + '/' + alias + '.key') }}  -noout
+    register: _key_modulus
+    changed_when: false
+    check_mode: false
+  
+  - name: Assertions
+    assert:
+      that:
+      - _csr_modulus.stdout == _key_modulus.stdout
 
 ...
