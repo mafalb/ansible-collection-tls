@@ -1,0 +1,23 @@
+# vim: set ft=yaml ts=2 expandtab:
+---
+
+- name: assertions
+  assert:
+    that:
+      - cert is defined
+      - alias is defined
+      - key is defined
+
+- name: Generate PKCS#12 file
+  openssl_pkcs12:
+    action: export
+    path: "{{ private_dir|default(tls_default_private_dir) }}/{{ alias }}.p12"
+    friendly_name: "{{ alias }}"
+    privatekey_path: "{{ private_dir|default(tls_default_private_dir) }}/{{ key }}"
+    certificate_path: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ cert }}"
+    other_certificates: "{{ (cert_dir|default(tls_default_cert_dir) + '/' + pem) if pem else omit }}"
+    passphrase: "{{ password|default(omit) }}"
+    state: present
+    backup: true
+
+...

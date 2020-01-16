@@ -1,0 +1,9 @@
+# vim: set ft=yaml ts=2 expandtab:
+---
+
+- name: files for {{ alias }} are absent
+  file:
+    path: "{{ private_dir|default(tls_default_private_dir) }}/{{ alias }}.p12"
+    state: absent
+
+...

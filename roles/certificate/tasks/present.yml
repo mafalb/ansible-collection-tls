@@ -78,7 +78,13 @@
   template:
     src: chain.j2
     dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.chain.pem"
-    mode: 0644
+    backup: true
+  notify: check for changed chain
+
+- name: "{{ alias }}.fullchain.pem is present"
+  template:
+    src: fullchain.j2
+    dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.fullchain.pem"
     backup: true
   notify: check for changed chain
 

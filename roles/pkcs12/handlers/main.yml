@@ -1,0 +1,20 @@
+# vim: set ft=yaml ts=2 expandtab:
+---
+
+- name: check for changed cert
+  check_mode: false
+  command: "true"
+
+- name: check for changed key
+  check_mode: false
+  command: "true"
+
+- name: check for changed chain
+  check_mode: false
+  command: "true"
+
+- name: check for changed private pem
+  check_mode: false
+  command: "true"
+
+...

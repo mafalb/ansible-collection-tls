@@ -1,0 +1,17 @@
+# vim: set ft=yaml ts=2 expandtab:
+---
+
+- debug: var=playbook_dir
+  tags:
+  - never
+  - debug
+
+- name: OS specific variables
+  include_vars:
+    file: "{{ ansible_os_family }}.yml"
+
+- name: include_tasks
+  include_tasks:
+    file: "{{ state|default('present') }}.yml"
+
+...

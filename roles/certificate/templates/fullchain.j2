@@ -1,0 +1,10 @@
+{% if chain is defined %}
+{% for cacert in chain %}
+{{ lookup('file', playbook_dir + '/' + cacert) }}
+{% endfor %}
+{% endif %}
+{% if root is defined %}
+{% for cacert in root %}
+{{ lookup('file', playbook_dir + '/' + cacert) }}
+{% endfor %}
+{% endif %}
