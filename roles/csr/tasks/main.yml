@@ -67,6 +67,10 @@
     src: "{{ item }}"
     dest: "{{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.cnf"
 
+- name: ansibles dependencies are present
+  include_role:
+    name: mafalb.ansible.node
+
 - name: CSR for {{ alias }} is present (existing will be overwritten)
   when: csr_overwrite is defined
   command: openssl req -new -utf8 -key {{ tls_default_key_dir + '/' + key_file|default(alias + '.key') }} -out {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr -config {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.cnf

@@ -22,7 +22,7 @@
     state: directory
     recurse: true
 
-- name: dependencies are installed
+- name: ansibles dependencies are present
   include_role:
     name: mafalb.ansible.node
 
