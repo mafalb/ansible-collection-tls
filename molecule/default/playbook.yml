@@ -45,7 +45,7 @@
   - role: mafalb.tls.csr
     alias: test3.example.com-20200114
     csr_dir: /tmp/another/csrdir
-    key_file: /tmp/test3.example.com-20200114
+    key_file: /tmp/test3.example.com-20200114.key
     x509_cn: test3.example.com
     x509_organization: bla
     x509_locality: Vienna

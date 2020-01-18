@@ -27,7 +27,7 @@
   - name: verify test3.example.com-20200114
     role: mafalb.tls.verify
     csr: /tmp/another/csrdir/test3.example.com-20200114.csr
-    key: "{{ __default_private_dir[ansible_os_family] }}/test3.example.com-20200114.key"
+    key: /tmp/test3.example.com-20200114.key
 
   - name: verify key/blubb/test4.example.com-20200114
     role: mafalb.tls.verify
