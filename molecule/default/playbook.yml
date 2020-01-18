@@ -35,7 +35,7 @@
 
   - role: mafalb.tls.csr
     alias: another_csrdir/test2.example.com-20200114
-    key_file: "{{ tls_default_private_dir }}/another_keydir/test2.example.com-20200114.key"
+    key_file: "{{ tls_default_key_dir }}/another_keydir/test2.example.com-20200114.key"
     x509_cn: test2.example.com
     x509_organization: bla
     x509_locality: Vienna

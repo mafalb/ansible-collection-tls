@@ -31,7 +31,7 @@
       path: "{{ tls_default_cert_dir }}/testcert1.example.com.cert"
       csr_path: "{{ tls_default_cert_dir }}/testcert1.example.com.csr"
       ownca_path: "{{ tls_default_cert_dir }}/testca1.cert"
-      ownca_privatekey_path: "{{ tls_default_private_dir }}/testca1.key"
+      ownca_privatekey_path: "{{ tls_default_key_dir }}/testca1.key"
       provider: ownca
 
   - name: fetch the certificate 

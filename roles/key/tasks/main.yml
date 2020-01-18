@@ -8,7 +8,7 @@
 - name: assertions
   assert:
     that:
-    - key_dir|default(tls_default_private_dir) is defined
+    - key_dir|default(tls_default_key_dir) is defined
     - alias is defined
     - key_size is defined
     - key_type in ['RSA']
@@ -17,7 +17,7 @@
   when:
   - key_dir is defined or alias|dirname != ""
   file:
-    path: "{{ key_dir|default(tls_default_private_dir) }}/{{ alias|dirname }}"
+    path: "{{ key_dir|default(tls_default_key_dir) }}/{{ alias|dirname }}"
     state: directory
     recurse: true
 
@@ -27,7 +27,7 @@
 
 - name: "{{ alias }} is present"
   openssl_privatekey:
-    path: "{{ key_dir|default(tls_default_private_dir) }}/{{ alias }}.key"
+    path: "{{ key_dir|default(tls_default_key_dir) }}/{{ alias }}.key"
     size: "{{ key_size }}"
     type: "{{ key_type }}"
     backup: true
