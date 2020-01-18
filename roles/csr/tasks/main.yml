@@ -51,6 +51,10 @@
       that:
       - item in openssl_extended_key_usages
 
+- name: ansibles dependencies are present
+  include_role:
+    name: mafalb.ansible.node
+
 - name: directory for {{ alias }} does exist
   when:
   - csr_dir is defined or alias|dirname != ""
@@ -66,10 +70,6 @@
   template:
     src: "{{ item }}"
     dest: "{{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.cnf"
-
-- name: ansibles dependencies are present
-  include_role:
-    name: mafalb.ansible.node
 
 - name: CSR for {{ alias }} is present (existing will be overwritten)
   when: csr_overwrite is defined
