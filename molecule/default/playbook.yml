@@ -7,7 +7,24 @@
     http_proxy: "{{ lookup('env', 'http_proxy') }}"
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
     no_proxy: "{{ lookup('env', 'no_proxy') }}"
+
+  pre_tasks:
+
+  - name: key is present
+    copy:
+      src: testkey.key
+      dest: /tmp/
+
   roles:
+
+  - role: mafalb.tls.csr
+    alias: testkey
+    key_file: /tmp/testkey.key
+    x509_cn: testkey
+    x509_organization: bla
+    x509_locality: Vienna
+    x509_province: Vienna
+    x509_country: AT
 
   - role: mafalb.tls.key
     alias: test1.example.com-20200114

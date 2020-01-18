@@ -16,6 +16,11 @@
 
   - name: verify test1.example.com-20200114
     role: mafalb.tls.verify
+    csr: "{{ __default_cert_dir[ansible_os_family] }}/testkey.csr"
+    key: /tmp/testkey.key
+
+  - name: verify test1.example.com-20200114
+    role: mafalb.tls.verify
     csr: "{{ __default_cert_dir[ansible_os_family] }}/test1.example.com-20200114.csr"
     key: "{{ __default_private_dir[ansible_os_family] }}/test1.example.com-20200114.key"
 
