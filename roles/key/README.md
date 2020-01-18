@@ -1,6 +1,6 @@
 # Ansible role - mafalb.tls.key
 
-Role for creating a private TLS key.
+Role for creating a private TLS key. For now only RSA keys are supported.
 
 ### Basic Usage
 
