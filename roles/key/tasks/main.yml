@@ -8,12 +8,12 @@
 - name: assertions
   assert:
     that:
-    - tls_default_private_dir is defined
+    - key_dir|default(tls_default_private_dir) is defined
     - alias is defined
     - key_size is defined
     - key_type in ['RSA']
 
-- name: directory for key does exist
+- name: directory for {{ alias }} is present
   when:
   - key_dir is defined or alias|dirname != ""
   file:
@@ -25,7 +25,7 @@
   include_role:
     name: mafalb.ansible.node
 
-- name: create key
+- name: "{{ alias }} is present"
   openssl_privatekey:
     path: "{{ key_dir|default(tls_default_private_dir) }}/{{ alias }}.key"
     size: "{{ key_size }}"

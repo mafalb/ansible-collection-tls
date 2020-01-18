@@ -12,36 +12,26 @@
       Debian: /etc/ssl/certs
       RedHat: /etc/pki/tls/certs
 
-  tasks:
+  roles:
 
-  - name: get modulus for test1.example.com CSR
-    command: openssl req -modulus -in {{ __default_cert_dir[ansible_os_family] }}/test1.example.com-20200114.csr -noout
-    register: _csr_modulus_test1
-    changed_when: false
+  - name: verify test1.example.com-20200114
+    role: mafalb.tls.verify
+    csr: "{{ __default_cert_dir[ansible_os_family] }}/test1.example.com-20200114.csr"
+    key: "{{ __default_private_dir[ansible_os_family] }}/test1.example.com-20200114.key"
 
-  - name: get modulus of test1.example.com key
-    command: openssl rsa -modulus -in {{ __default_private_dir[ansible_os_family] }}/test1.example.com-20200114.key  -noout
-    register: _key_modulus_test1
-    changed_when: false
+  - name: verify another_keydir/test2.example.com-20200114
+    role: mafalb.tls.verify
+    csr: "{{ __default_cert_dir[ansible_os_family] }}/another_csrdir/test2.example.com-20200114.csr"
+    key: "{{ __default_private_dir[ansible_os_family] }}/another_keydir/test2.example.com-20200114.key"
 
-  - name: Assertions test1.example.com
-    assert:
-      that:
-      - _csr_modulus_test1.stdout == _key_modulus_test1.stdout
+  - name: verify test3.example.com-20200114
+    role: mafalb.tls.verify
+    csr: /tmp/another/csrdir/test3.example.com-20200114.csr
+    key: "{{ __default_private_dir[ansible_os_family] }}/test3.example.com-20200114.key"
 
-  - name: get modulus of test2.example.com CSR
-    command: openssl req -modulus -in {{ __default_cert_dir[ansible_os_family] }}/test2.example.com-20200114.csr -noout
-    register: _csr_modulus_test2
-    changed_when: false
-
-  - name: get modulus of test2.example.com key
-    command: openssl rsa -modulus -in {{ __default_private_dir[ansible_os_family] }}/test2.example.com-20200114.key  -noout
-    register: _key_modulus_test2
-    changed_when: false
-
-  - name: Assertions test1.example.com
-    assert:
-      that:
-      - _csr_modulus_test2.stdout == _key_modulus_test2.stdout
+  - name: verify key/blubb/test4.example.com-20200114
+    role: mafalb.tls.verify
+    csr: "{{ __default_cert_dir[ansible_os_family] }}/test4.example.com-20200114.csr"
+    key: tmp/key/blubb/test4.example.com-20200114.key
 
 ...

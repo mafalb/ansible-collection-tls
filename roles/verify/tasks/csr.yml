@@ -1,0 +1,19 @@
+# vim: set ft=yaml ts=2 expandtab:
+---
+
+- name: get modulus of {{ csr }}
+  command: openssl req -modulus -in {{ csr }} -noout
+  register: _csr_modulus
+  changed_when: false
+
+- name: get modulus of {{ key }}
+  command: openssl rsa -modulus -in {{ key }} -noout
+  register: _key_modulus
+  changed_when: false
+
+- name: Assertions for {{ csr }}
+  assert:
+    that:
+    - _csr_modulus.stdout == _key_modulus.stdout
+
+...

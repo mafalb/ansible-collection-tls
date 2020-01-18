@@ -15,7 +15,7 @@ platforms:
   - name: t_centos8
     image: centos:8
   - name: t_ubuntu16
-    image: ubuntu:bionic
+    image: ubuntu:xenial
   - name: t_ubuntu18
     image: ubuntu:bionic
   - name: t_ubuntu20
