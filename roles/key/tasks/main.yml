@@ -2,9 +2,8 @@
 ---
 
 - name: OS specific config
-  include_role:
+  import_role:
     name: mafalb.tls.cfg
-    public: true
  
 - name: assertions
   assert:
@@ -23,7 +22,7 @@
     recurse: true
 
 - name: ansibles dependencies are present
-  include_role:
+  import_role:
     name: mafalb.ansible.node
 
 - name: "{{ alias }} is present"
