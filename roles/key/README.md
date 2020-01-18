@@ -4,32 +4,45 @@ Role for creating a private TLS key.
 
 ### Basic Usage
 
-```ansible
-- name: install molecule
-  hosts: localhost
+```yaml
+- hosts: localhost
   roles:
   - role: mafalb.tls.key
-    alias: test.example.com
-    key_dir: /tmp/dir
-    key_size: 2048
-    key_type: RSA
+    alias: test.example.com-20200114
 ```
 
 ## Variables
 
+---
+
 ```key_dir```
 
 The directory where the key is saved.
-Defaults to system specific value, e.g. /etc/pki/tls/private on RedHat.
+Defaults to system specific value, e.g. ```/etc/pki/tls/private``` on RedHat.
+
+---
 
 ```alias```
 
 the generated key is stored at ```{{ key_dir }}/{{ alias }}.key```
-you can specify alias with subdirectories.
+you can specify alias with subdirectories, e.g.
 
-```key_size``` 
+```yaml
+alias: subdirectory/test.example.com
+```
 
-```key_type```
+will save the key into ```{{ key_dir}}/subdirectory/test.example.com.key```
+
+---
+
+```key_size```
+
+---
+
+```key_type``` defaults to RSA
+
+---
+
 
 ## License
 
