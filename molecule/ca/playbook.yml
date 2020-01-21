@@ -6,12 +6,22 @@
   roles:
 
   - role: mafalb.tls.ca
-    alias: testca1
-    x509_cn: Test CA 1
+    alias: Root_CA_1
+    x509_cn: Root CA 1
     x509_organization: Test CA Organization
     x509_locality: Wien
     x509_province: Wien
     x509_country: AT
+
+  - role: mafalb.tls.ca
+    alias: Signing_CA_1
+    x509_cn: Signing CA 1
+    x509_organization: Test CA Organization
+    x509_locality: Wien
+    x509_province: Wien
+    x509_country: AT
+    signing_key: Root_CA_1.key
+    signing_cert: Root_CA_1.cert
 
   - role: mafalb.tls.key
     alias: testcert1.example.com
@@ -30,14 +40,15 @@
     openssl_certificate:
       path: "{{ tls_default_cert_dir }}/testcert1.example.com.cert"
       csr_path: "{{ tls_default_cert_dir }}/testcert1.example.com.csr"
-      ownca_path: "{{ tls_default_cert_dir }}/testca1.cert"
-      ownca_privatekey_path: "{{ tls_default_key_dir }}/testca1.key"
+      ownca_path: "{{ tls_default_cert_dir }}/Signing_CA_1.cert"
+      ownca_privatekey_path: "{{ tls_default_key_dir }}/Signing_CA_1.key"
       provider: ownca
 
   - name: fetch the certificate 
     loop:
     - "{{ tls_default_cert_dir }}/testcert1.example.com.cert"
-    - "{{ tls_default_cert_dir }}/testca1.cert"
+    - "{{ tls_default_cert_dir }}/Signing_CA_1.cert"
+    - "{{ tls_default_cert_dir }}/Root_CA_1.cert"
     fetch:
       src: "{{ item }}"
       flat: true
@@ -50,6 +61,8 @@
       alias: anothercert1.example.com
       cert: files/testca1/testcert1.example.com.cert
       key: testcert1.example.com.key
+      chain:
+      - files/testca1/Signing_CA_1.cert
       root:
-      - files/testca1/testca1.cert
+      - files/testca1/Root_CA_1.cert
 ...
