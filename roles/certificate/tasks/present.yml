@@ -40,6 +40,12 @@
       path: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.root.cert"
       state: absent
 
+  - name: intermediate certificates are present
+    loop: "{{ chain }}"
+    copy:
+      src: "{{ item }}"
+      dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ (item|basename|splitext)[0] }}.cert"
+      
 - debug: var=key
   no_log: true
   tags:
