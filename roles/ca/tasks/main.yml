@@ -9,7 +9,7 @@
   assert:
     that:
       - cert_dir|default(tls_default_cert_dir) is defined
-      - private_dir|default(tls_default_private_dir) is defined
+      - private_dir|default(tls_default_key_dir) is defined
       - alias is defined
 
 - name: CA privatekey is present
@@ -25,7 +25,7 @@
 - name: CA certificate is present
   openssl_certificate:
     path: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.cert"
-    privatekey_path: "{{ private_dir|default(tls_default_private_dir) }}/{{ alias }}.key"
+    privatekey_path: "{{ private_dir|default(tls_default_key_dir) }}/{{ alias }}.key"
     csr_path: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr"
     provider: selfsigned
 

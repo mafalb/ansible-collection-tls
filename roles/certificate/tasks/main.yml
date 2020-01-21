@@ -6,9 +6,10 @@
   - never
   - debug
 
-- name: OS specific variables
-  include_vars:
-    file: "{{ ansible_os_family }}.yml"
+- name: OS specific config
+  include_role:
+    name: mafalb.tls.cfg
+    public: true
 
 - name: include_tasks
   include_tasks:

@@ -1,0 +1,7 @@
+# vim: set ft=yaml ts=2 expandtab:
+---
+
+tls_default_cert_dir: /etc/pki/tls/certs
+tls_default_key_dir: "{{ '' if key_file[0]|default('') == '/' else '/etc/pki/tls/private' }}"
+
+...

@@ -7,10 +7,39 @@
     http_proxy: "{{ lookup('env', 'http_proxy') }}"
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
     no_proxy: "{{ lookup('env', 'no_proxy') }}"
+
+  pre_tasks:
+
+  - name: key is present
+    copy:
+      src: testkey.key
+      dest: /tmp/
+
   roles:
+
+  - role: mafalb.tls.csr
+    alias: testkey
+    key_file: /tmp/testkey.key
+    x509_cn: testkey
+    x509_organization: bla
+    x509_locality: Vienna
+    x509_province: Vienna
+    x509_country: AT
 
   - role: mafalb.tls.key
     alias: test1.example.com-20200114
+
+  - role: mafalb.tls.key
+    alias: another_keydir/test2.example.com-20200114
+
+  - role: mafalb.tls.key
+    alias: test3.example.com-20200114
+    key_dir: /tmp
+
+  - role: mafalb.tls.key
+    alias: key/blubb/test4.example.com-20200114
+    key_dir: /tmp
+
   - role: mafalb.tls.csr
     alias: test1.example.com-20200114
     x509_cn: test1.example.com
@@ -21,11 +50,29 @@
     x509_sans:
     - example.com
 
-  - role: mafalb.tls.key
-    alias: test2.example.com-20200114
   - role: mafalb.tls.csr
-    alias: test2.example.com-20200114
+    alias: another_csrdir/test2.example.com-20200114
+    key_file: another_keydir/test2.example.com-20200114.key
     x509_cn: test2.example.com
+    x509_organization: bla
+    x509_locality: Vienna
+    x509_province: Vienna
+    x509_country: AT
+
+  - role: mafalb.tls.csr
+    alias: test3.example.com-20200114
+    csr_dir: /tmp/another/csrdir
+    key_file: /tmp/test3.example.com-20200114.key
+    x509_cn: test3.example.com
+    x509_organization: bla
+    x509_locality: Vienna
+    x509_province: Vienna
+    x509_country: AT
+
+  - role: mafalb.tls.csr
+    alias: test4.example.com-20200114
+    key_file: /tmp/key/blubb/test4.example.com-20200114.key
+    x509_cn: test4.example.com
     x509_organization: bla
     x509_locality: Vienna
     x509_province: Vienna

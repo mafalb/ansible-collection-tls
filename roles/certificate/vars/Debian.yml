@@ -1,7 +1,0 @@
-# vim: set ft=yaml ts=2 expandtab:
----
-
-tls_default_cert_dir: /etc/ssl/certs
-tls_default_private_dir: /etc/ssl/private
-
-...

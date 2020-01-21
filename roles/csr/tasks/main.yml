@@ -1,14 +1,14 @@
 # vim: set ft=yaml ts=2 expandtab:
 ---
 
-- name: OS specific variables
-  include_vars:
-      file: "{{ ansible_os_family }}.yml"
+- name: OS specific config
+  import_role:
+    name: mafalb.tls.cfg
 
 - name: assertions
   assert:
     that:
-    - key_file|default(tls_default_private_dir) is defined
+    - key_file|default(tls_default_key_dir + '/' + alias + '.key') is defined
     - csr_dir|default(tls_default_cert_dir) is defined
     - alias is defined
 
@@ -50,7 +50,11 @@
       that:
       - item in openssl_extended_key_usages
 
-- name: directory for csr does exist
+- name: ansibles dependencies are present
+  import_role:
+    name: mafalb.ansible.node
+
+- name: directory for {{ alias }} does exist
   when:
   - csr_dir is defined or alias|dirname != ""
   file:
@@ -58,7 +62,7 @@
     state: directory
     recurse: true
 
-- name: CSR config is present
+- name: config for {{ alias }} is present
   with_first_found:
     - "{{ csr_config_file|default(omit) }}"
     - csr.cnf.j2
@@ -66,34 +70,21 @@
     src: "{{ item }}"
     dest: "{{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.cnf"
 
-- name: CSR is present (existing will be overwritten)
+- name: CSR for {{ alias }} is present (existing will be overwritten)
   when: csr_overwrite is defined
-  command: openssl req -new -utf8 -key {{ key_file|default(tls_default_private_dir + '/' + alias + '.key') }} -out {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr -config {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.cnf
+  command: openssl req -new -utf8 -key {{ tls_default_key_dir + '/' + key_file|default(alias + '.key') }} -out {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr -config {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.cnf
 
-- name: CSR is present
+- name: CSR for {{ alias }} is present
   when: csr_overwrite is not defined
-  command: openssl req -new -utf8 -key {{ key_file|default(tls_default_private_dir + '/' + alias + '.key') }} -out {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr -config {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.cnf
+  command: openssl req -new -utf8 -key {{ tls_default_key_dir + '/' + key_file|default(alias + '.key') }} -out {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr -config {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.cnf
   args:
     creates: "{{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr"
 
 - name: CSR matches key
-  block:
-
-  - name: get modulus of CSR
-    command: openssl req -modulus -in {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr -noout
-    register: _csr_modulus
-    changed_when: false
-    check_mode: false
-  
-  - name: get modulus of test1.example.com key
-    command: openssl rsa -modulus -in {{ key_file|default(tls_default_private_dir + '/' + alias + '.key') }}  -noout
-    register: _key_modulus
-    changed_when: false
-    check_mode: false
-  
-  - name: Assertions
-    assert:
-      that:
-      - _csr_modulus.stdout == _key_modulus.stdout
+  include_role:
+    name: mafalb.tls.verify
+  vars:
+    csr: "{{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr"
+    key: "{{ tls_default_key_dir + '/' + key_file|default(alias + '.key') }}"
 
 ...

@@ -3,7 +3,7 @@
 
 - name: files for {{ alias }} are absent
   file:
-    path: "{{ private_dir|default(tls_default_private_dir) }}/{{ alias }}.p12"
+    path: "{{ private_dir|default(tls_default_key_dir) }}/{{ alias }}.p12"
     state: absent
 
 ...

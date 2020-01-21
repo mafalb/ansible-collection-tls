@@ -1,0 +1,11 @@
+# vim: set ft=yaml ts=2 expandtab:
+---
+
+- name: verify CSR
+  when:
+  - csr is defined
+  - key is defined
+  include_tasks:
+    file: csr.yml
+
+...
