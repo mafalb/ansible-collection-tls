@@ -1,33 +1,32 @@
 # vim: set ft=yaml ts=2 expandtab:
 ---
 
-- name: Verify
+- name: Verify key and csr
   hosts: all
-
-  vars:
-    __default_private_dir:
-      Debian: /etc/ssl/private
-      RedHat: /etc/pki/tls/private
-    __default_cert_dir:
-      Debian: /etc/ssl/certs
-      RedHat: /etc/pki/tls/certs
+  environment:
+    http_proxy: "{{ lookup('env', 'http_proxy') }}"
+    https_proxy: "{{ lookup('env', 'https_proxy') }}"
+    no_proxy: "{{ lookup('env', 'no_proxy') }}"
 
   roles:
 
-  - name: verify test1.example.com-20200114
-    role: mafalb.tls.verify
-    csr: "{{ __default_cert_dir[ansible_os_family] }}/testkey.csr"
-    key: /tmp/testkey.key
+  - name: OS specific config
+    role: mafalb.tls.cfg
 
   - name: verify test1.example.com-20200114
     role: mafalb.tls.verify
-    csr: "{{ __default_cert_dir[ansible_os_family] }}/test1.example.com-20200114.csr"
-    key: "{{ __default_private_dir[ansible_os_family] }}/test1.example.com-20200114.key"
+    csr: "{{ default_cert_dir }}/test1.example.com-20200114.csr"
+    key: "{{ default_key_dir }}/test1.example.com-20200114.key"
 
   - name: verify another_keydir/test2.example.com-20200114
     role: mafalb.tls.verify
-    csr: "{{ __default_cert_dir[ansible_os_family] }}/another_csrdir/test2.example.com-20200114.csr"
-    key: "{{ __default_private_dir[ansible_os_family] }}/another_keydir/test2.example.com-20200114.key"
+    csr: "{{ default_cert_dir }}/another_csrdir/test2.example.com-20200114.csr"
+    key: "{{ default_key_dir }}/another_keydir/test2.example.com-20200114.key"
+
+  - name: verify testkey
+    role: mafalb.tls.verify
+    csr: "{{ default_cert_dir }}/testkey.csr"
+    key: "{{ default_key_dir }}/test3.example.com-20200114.key"
 
   - name: verify test3.example.com-20200114
     role: mafalb.tls.verify
@@ -36,7 +35,28 @@
 
   - name: verify key/blubb/test4.example.com-20200114
     role: mafalb.tls.verify
-    csr: "{{ __default_cert_dir[ansible_os_family] }}/test4.example.com-20200114.csr"
-    key: tmp/key/blubb/test4.example.com-20200114.key
+    csr: "{{ default_cert_dir }}/test4.example.com-20200114.csr"
+    key: /tmp/key/blubb/test4.example.com-20200114.key
 
+- name: CA
+  hosts: all
+  environment:
+    http_proxy: "{{ lookup('env', 'http_proxy') }}"
+    https_proxy: "{{ lookup('env', 'https_proxy') }}"
+    no_proxy: "{{ lookup('env', 'no_proxy') }}"
+
+  roles:
+
+  - name: verify root_ca_1
+    role: mafalb.tls.verify
+    csr: /tmp/root_ca_1/root_ca_1.csr
+    key: /tmp/root_ca_1/root_ca_1.key
+    cert: /tmp/root_ca_1/root_ca_1.cert
+
+  - name: verify signing_ca_1
+    role: mafalb.tls.verify
+    csr: /tmp/signing_ca_1/signing_ca_1.csr
+    key: /tmp/signing_ca_1/signing_ca_1.key
+    cert: /tmp/signing_ca_1/signing_ca_1.cert
+  
 ...

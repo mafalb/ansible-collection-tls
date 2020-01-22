@@ -10,7 +10,7 @@
   assert:
     that:
       - cert_dir|default(tls_default_cert_dir) is defined
-      - private_dir|default(tls_default_key_dir) is defined
+      - key_dir|default(tls_default_key_dir) is defined
       - alias is defined
 
 - name: CA privatekey is present
@@ -27,7 +27,7 @@
   when: signing_key is not defined
   openssl_certificate:
     path: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.cert"
-    privatekey_path: "{{ private_dir|default(tls_default_key_dir) }}/{{ alias }}.key"
+    privatekey_path: "{{ key_dir|default(tls_default_key_dir) }}/{{ alias }}.key"
     csr_path: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr"
     provider: selfsigned
 
@@ -35,8 +35,8 @@
   when: signing_key is defined
   openssl_certificate:
     path: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.cert"
-    ownca_path: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ signing_cert }}"
-    ownca_privatekey_path: "{{ private_dir|default(tls_default_key_dir) }}/{{ signing_key }}"
+    ownca_path: "{{ signing_cert }}"
+    ownca_privatekey_path: "{{ signing_key }}"
     csr_path: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr"
     provider: ownca
 

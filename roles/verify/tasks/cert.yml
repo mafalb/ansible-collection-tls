@@ -1,0 +1,19 @@
+# vim: set ft=yaml ts=2 expandtab:
+---
+
+- name: get modulus of {{ cert }}
+  command: openssl x509 -modulus -in {{ cert }} -noout
+  register: _cert_modulus
+  changed_when: false
+
+- name: get modulus of {{ key }}
+  command: openssl rsa -modulus -in {{ key }} -noout
+  register: _key_modulus_2
+  changed_when: false
+
+- name: Assertions for {{ cert }}
+  assert:
+    that:
+    - _cert_modulus.stdout == _key_modulus_2.stdout
+
+...

@@ -1,30 +1,14 @@
 # vim: set ft=yaml ts=2 expandtab:
 ---
 
-- name: Converge
+- name: Converge key
   hosts: all
   environment:
     http_proxy: "{{ lookup('env', 'http_proxy') }}"
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
     no_proxy: "{{ lookup('env', 'no_proxy') }}"
 
-  pre_tasks:
-
-  - name: key is present
-    copy:
-      src: testkey.key
-      dest: /tmp/
-
   roles:
-
-  - role: mafalb.tls.csr
-    alias: testkey
-    key_file: /tmp/testkey.key
-    x509_cn: testkey
-    x509_organization: bla
-    x509_locality: Vienna
-    x509_province: Vienna
-    x509_country: AT
 
   - role: mafalb.tls.key
     alias: test1.example.com-20200114
@@ -40,6 +24,16 @@
     alias: key/blubb/test4.example.com-20200114
     key_dir: /tmp
 
+
+- name: Converge csr
+  hosts: all
+  environment:
+    http_proxy: "{{ lookup('env', 'http_proxy') }}"
+    https_proxy: "{{ lookup('env', 'https_proxy') }}"
+    no_proxy: "{{ lookup('env', 'no_proxy') }}"
+
+  roles:
+
   - role: mafalb.tls.csr
     alias: test1.example.com-20200114
     x509_cn: test1.example.com
@@ -54,6 +48,15 @@
     alias: another_csrdir/test2.example.com-20200114
     key_file: another_keydir/test2.example.com-20200114.key
     x509_cn: test2.example.com
+    x509_organization: bla
+    x509_locality: Vienna
+    x509_province: Vienna
+    x509_country: AT
+
+  - role: mafalb.tls.csr
+    alias: testkey
+    key_file: /tmp/test3.example.com-20200114.key
+    x509_cn: test1
     x509_organization: bla
     x509_locality: Vienna
     x509_province: Vienna
@@ -77,5 +80,87 @@
     x509_locality: Vienna
     x509_province: Vienna
     x509_country: AT
+
+- name: Converge CA
+  hosts: all
+  environment:
+    http_proxy: "{{ lookup('env', 'http_proxy') }}"
+    https_proxy: "{{ lookup('env', 'https_proxy') }}"
+    no_proxy: "{{ lookup('env', 'no_proxy') }}"
+
+  roles:
+
+  - role: mafalb.tls.ca
+    alias: root_ca_1
+    x509_cn: Root CA 1
+    x509_organization: Test CA Organization
+    x509_locality: Wien
+    x509_province: Wien
+    x509_country: AT
+    key_dir: /tmp/root_ca_1
+    csr_dir: /tmp/root_ca_1
+    cert_dir: /tmp/root_ca_1
+
+  - role: mafalb.tls.ca
+    alias: signing_ca_1
+    x509_cn: Signing CA 1
+    x509_organization: Test CA Organization
+    x509_locality: Wien
+    x509_province: Wien
+    x509_country: AT
+    signing_key: /tmp/root_ca_1/root_ca_1.key
+    signing_cert: /tmp/root_ca_1/root_ca_1.cert
+    key_dir: /tmp/signing_ca_1
+    csr_dir: /tmp/signing_ca_1
+    cert_dir: /tmp/signing_ca_1
+
+  - role: mafalb.tls.key
+    alias: testcert1.example.com
+
+  - role: mafalb.tls.csr
+    alias: testcert1.example.com
+    x509_cn: testcert1.example.com
+    x509_organization: Test Organization
+    x509_locality: Wien
+    x509_province: Wien
+    x509_country: AT
+
+  tasks:
+
+  - name: testcert1.example.com cert is present
+    openssl_certificate:
+      path: /tmp/testcert1.example.com.cert
+      csr_path: "{{ tls_default_cert_dir }}/testcert1.example.com.csr"
+      ownca_path: /tmp/signing_ca_1/signing_ca_1.cert
+      ownca_privatekey_path: /tmp/signing_ca_1/signing_ca_1.key
+      provider: ownca
+
+  - name: fetch the certificate
+    loop:
+    - /tmp/testcert1.example.com.cert
+    - /tmp/signing_ca_1/signing_ca_1.cert
+    - /tmp/root_ca_1/root_ca_1.cert
+    fetch:
+      src: "{{ item }}"
+      flat: true
+      dest: files/testcert1/{{ ansible_hostname }}/{{ item|basename }}
+
+
+- name: Converge certs
+  hosts: all
+  environment:
+    http_proxy: "{{ lookup('env', 'http_proxy') }}"
+    https_proxy: "{{ lookup('env', 'https_proxy') }}"
+    no_proxy: "{{ lookup('env', 'no_proxy') }}"
+
+  roles:
+  - role: mafalb.tls.certificate
+    alias: anothernamefortestcert1.example.com
+    cert: files/testcert1/{{ ansible_hostname }}/testcert1.example.com.cert
+    key: testcert1.example.com.key
+    chain:
+    - files/testcert1/{{ ansible_hostname }}/signing_ca_1.cert
+    root:
+    - files/testcert1/{{ ansible_hostname }}/root_ca_1.cert
 
 ...
