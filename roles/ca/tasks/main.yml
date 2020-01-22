@@ -40,4 +40,9 @@
     csr_path: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr"
     provider: ownca
 
+- name: Get information on generated certificate
+  openssl_certificate_info:
+    path: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.cert"
+  register: _cacert_info
+
 ...

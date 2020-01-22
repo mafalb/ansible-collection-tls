@@ -82,7 +82,7 @@
     x509_country: AT
 
 - name: Converge CA
-  hosts: all
+  hosts: all,!t_centos6
   environment:
     http_proxy: "{{ lookup('env', 'http_proxy') }}"
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
@@ -114,6 +114,15 @@
     csr_dir: /tmp/signing_ca_1
     cert_dir: /tmp/signing_ca_1
 
+- name: Converge CA
+  hosts: all
+  environment:
+    http_proxy: "{{ lookup('env', 'http_proxy') }}"
+    https_proxy: "{{ lookup('env', 'https_proxy') }}"
+    no_proxy: "{{ lookup('env', 'no_proxy') }}"
+
+  roles:
+
   - role: mafalb.tls.key
     alias: testcert1.example.com
 
@@ -124,6 +133,13 @@
     x509_locality: Wien
     x509_province: Wien
     x509_country: AT
+
+- name: Converge CA
+  hosts: all,!t_centos6
+  environment:
+    http_proxy: "{{ lookup('env', 'http_proxy') }}"
+    https_proxy: "{{ lookup('env', 'https_proxy') }}"
+    no_proxy: "{{ lookup('env', 'no_proxy') }}"
 
   tasks:
 
@@ -147,7 +163,7 @@
 
 
 - name: Converge certs
-  hosts: all
+  hosts: all,!centos
   environment:
     http_proxy: "{{ lookup('env', 'http_proxy') }}"
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
