@@ -29,13 +29,13 @@ platforms:
 
 provisioner:
   name: ansible
+  config_options:
+    defaults:
+      gathering: smart
   lint:
     name: ansible-lint
   env:
     ANSIBLE_COLLECTIONS_PATHS: "../../../../..:~/.ansible/collections"
-  inventory:
-    t_CA:
-      ansible_python_interpreter: /usr/bin/python3
 verifier:
   name: ansible
   lint:
