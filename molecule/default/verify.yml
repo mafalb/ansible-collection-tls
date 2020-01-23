@@ -38,8 +38,8 @@
     csr: "{{ default_cert_dir }}/test4.example.com-20200114.csr"
     key: /tmp/key/blubb/test4.example.com-20200114.key
 
-- name: CA
-  hosts: all
+- name: Verify CA
+  hosts: all,!t_centos6
   environment:
     http_proxy: "{{ lookup('env', 'http_proxy') }}"
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
@@ -58,5 +58,35 @@
     csr: /tmp/signing_ca_1/signing_ca_1.csr
     key: /tmp/signing_ca_1/signing_ca_1.key
     cert: /tmp/signing_ca_1/signing_ca_1.cert
-  
+
+- name: Verify test3.example.com
+  hosts: all,!t_centos6
+  environment:
+    http_proxy: "{{ lookup('env', 'http_proxy') }}"
+    https_proxy: "{{ lookup('env', 'https_proxy') }}"
+    no_proxy: "{{ lookup('env', 'no_proxy') }}"
+
+  roles:
+
+  - name: verify test3.example.com
+    role: mafalb.tls.verify
+    csr: /tmp/another/csrdir/test3.example.com-20200114.csr
+    key: /tmp/test3.example.com-20200114.key
+    cert: "{{ tls_default_cert_dir }}/test3.example.com.cert"
+
+- name: Verify test3.example.com
+  hosts: all
+  environment:
+    http_proxy: "{{ lookup('env', 'http_proxy') }}"
+    https_proxy: "{{ lookup('env', 'https_proxy') }}"
+    no_proxy: "{{ lookup('env', 'no_proxy') }}"
+
+  roles:
+
+  - name: verify test1.example.com
+    role: mafalb.tls.verify
+    csr: "{{ tls_default_cert_dir }}/test1.example.com.csr"
+    key: "{{ tls_default_cert_dir }}/test1.example.com.key"
+    cert: "{{ tls_default_cert_dir }}/test1.example.com.cert"
+
 ...

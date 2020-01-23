@@ -2,7 +2,7 @@
 ---
 
 - name: Converge key
-  hosts: all
+  hosts: all,!ca
   environment:
     http_proxy: "{{ lookup('env', 'http_proxy') }}"
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
@@ -26,7 +26,7 @@
 
 
 - name: Converge csr
-  hosts: all
+  hosts: all,!ca
   environment:
     http_proxy: "{{ lookup('env', 'http_proxy') }}"
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
@@ -81,8 +81,8 @@
     x509_province: Vienna
     x509_country: AT
 
-- name: Converge CA
-  hosts: all,!t_centos6
+- name: create CA
+  hosts: all,!ca,!t_centos6
   environment:
     http_proxy: "{{ lookup('env', 'http_proxy') }}"
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
@@ -114,28 +114,9 @@
     csr_dir: /tmp/signing_ca_1
     cert_dir: /tmp/signing_ca_1
 
-- name: Converge CA
-  hosts: all
-  environment:
-    http_proxy: "{{ lookup('env', 'http_proxy') }}"
-    https_proxy: "{{ lookup('env', 'https_proxy') }}"
-    no_proxy: "{{ lookup('env', 'no_proxy') }}"
 
-  roles:
-
-  - role: mafalb.tls.key
-    alias: testcert1.example.com
-
-  - role: mafalb.tls.csr
-    alias: testcert1.example.com
-    x509_cn: testcert1.example.com
-    x509_organization: Test Organization
-    x509_locality: Wien
-    x509_province: Wien
-    x509_country: AT
-
-- name: Converge CA
-  hosts: all,!t_centos6
+- name: test3.example.com
+  hosts: all,!ca,!t_centos6
   environment:
     http_proxy: "{{ lookup('env', 'http_proxy') }}"
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
@@ -143,17 +124,63 @@
 
   tasks:
 
-  - name: testcert1.example.com cert is present
+  - name: test3.example.com cert is present
     openssl_certificate:
-      path: /tmp/testcert1.example.com.cert
-      csr_path: "{{ tls_default_cert_dir }}/testcert1.example.com.csr"
+      path: "{{ tls_default_cert_dir }}/test3.example.com.cert"
+      csr_path: /tmp/another/csrdir/test3.example.com-20200114.csr
       ownca_path: /tmp/signing_ca_1/signing_ca_1.cert
       ownca_privatekey_path: /tmp/signing_ca_1/signing_ca_1.key
       provider: ownca
 
+
+- name: test1.example.com
+  hosts: all,!ca
+  environment:
+    http_proxy: "{{ lookup('env', 'http_proxy') }}"
+    https_proxy: "{{ lookup('env', 'https_proxy') }}"
+    no_proxy: "{{ lookup('env', 'no_proxy') }}"
+
+  tasks:
+
+  - name: fetch the csr
+    fetch:
+      src: "{{ tls_default_cert_dir }}/test1.example.com-20200114.csr"
+      flat: true
+      dest: files/testcert2/{{ ansible_hostname }}/test1.example.com-20200114.csr
+
+  - name: create per hostname directory
+    delegate_to: t_CA
+    file:
+      path: /tmp/signing_ca_1/{{ ansible_hostname }}
+      state: directory
+
+  - name: copy the csr to CA
+    delegate_to: t_CA
+    copy:
+      src: files/testcert2/{{ ansible_hostname }}/test1.example.com-20200114.csr
+      dest: /tmp/signing_ca_1/{{ ansible_hostname }}/
+
+  - name: test1.example.com cert is present
+    delegate_to: t_CA
+    openssl_certificate:
+      path: /tmp/signing_ca_1/test1.example.com.cert
+      csr_path: /tmp/signing_ca_1/{{ ansible_hostname }}/test1.example.com-20200114.csr
+      ownca_path: /tmp/signing_ca_1/signing_ca_1.cert
+      ownca_privatekey_path: /tmp/signing_ca_1/signing_ca_1.key
+      provider: ownca
+
+- name: Converge test1.example.com
+  hosts: all
+  environment:
+    http_proxy: "{{ lookup('env', 'http_proxy') }}"
+    https_proxy: "{{ lookup('env', 'https_proxy') }}"
+    no_proxy: "{{ lookup('env', 'no_proxy') }}"
+
+  tasks:
+
   - name: fetch the certificate
     loop:
-    - /tmp/testcert1.example.com.cert
+    - /tmp/signing_ca_1/test1.example.com.cert
     - /tmp/signing_ca_1/signing_ca_1.cert
     - /tmp/root_ca_1/root_ca_1.cert
     fetch:
@@ -161,19 +188,12 @@
       flat: true
       dest: files/testcert1/{{ ansible_hostname }}/{{ item|basename }}
 
-
-- name: Converge certs
-  hosts: all,!centos
-  environment:
-    http_proxy: "{{ lookup('env', 'http_proxy') }}"
-    https_proxy: "{{ lookup('env', 'https_proxy') }}"
-    no_proxy: "{{ lookup('env', 'no_proxy') }}"
-
   roles:
+
   - role: mafalb.tls.certificate
-    alias: anothernamefortestcert1.example.com
-    cert: files/testcert1/{{ ansible_hostname }}/testcert1.example.com.cert
-    key: testcert1.example.com.key
+    alias: test1.example.com
+    cert: files/testcert1/{{ ansible_hostname }}/test1.example.com.cert
+    key: test1.example.com.key
     chain:
     - files/testcert1/{{ ansible_hostname }}/signing_ca_1.cert
     root:

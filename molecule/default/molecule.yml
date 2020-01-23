@@ -20,6 +20,10 @@ platforms:
     image: ubuntu:bionic
   - name: t_ubuntu20
     image: ubuntu:focal
+  - name: t_CA
+    image: centos:8
+    groups:
+    - ca
 #  - name: t_rawhide
 #    image: fedora:rawhide
 
@@ -29,6 +33,9 @@ provisioner:
     name: ansible-lint
   env:
     ANSIBLE_COLLECTIONS_PATHS: "../../../../..:~/.ansible/collections"
+  inventory:
+    t_CA:
+      ansible_python_interpreter: /usr/bin/python3
 verifier:
   name: ansible
   lint:
