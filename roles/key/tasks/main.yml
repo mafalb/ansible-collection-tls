@@ -21,10 +21,6 @@
     state: directory
     recurse: true
 
-- name: ansibles dependencies are present
-  import_role:
-    name: mafalb.ansible.node
-
 - name: "{{ alias }} is present"
   openssl_privatekey:
     path: "{{ key_dir|default(tls_default_key_dir) }}/{{ alias }}.key"

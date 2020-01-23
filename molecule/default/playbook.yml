@@ -1,7 +1,13 @@
 # vim: set ft=yaml ts=2 expandtab:
 ---
 
-- name: Converge key
+- name: dependencies
+  hosts: all
+  roles:
+  - role: mafalb.ansible.node
+  - role: mafalb.tls.cfg
+  
+- name: create key
   hosts: all,!ca
   environment:
     http_proxy: "{{ lookup('env', 'http_proxy') }}"

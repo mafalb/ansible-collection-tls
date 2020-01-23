@@ -50,10 +50,6 @@
       that:
       - item in openssl_extended_key_usages
 
-- name: ansibles dependencies are present
-  import_role:
-    name: mafalb.ansible.node
-
 - name: directory for {{ alias }} does exist
   when:
   - csr_dir is defined or alias|dirname != ""
