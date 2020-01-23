@@ -6,11 +6,6 @@
   register: _cert_modulus
   changed_when: false
 
-- name: get modulus of {{ key }}
-  command: openssl rsa -modulus -in {{ key }} -noout
-  register: _key_modulus_2
-  changed_when: false
-
 - name: Assertions for {{ cert }}
   assert:
     that:
