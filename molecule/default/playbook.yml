@@ -182,7 +182,7 @@
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
     no_proxy: "{{ lookup('env', 'no_proxy') }}"
 
-  tasks:
+  pre_tasks:
 
   - name: fetch the certificate
     loop:
