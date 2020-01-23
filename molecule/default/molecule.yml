@@ -36,6 +36,10 @@ provisioner:
     name: ansible-lint
   env:
     ANSIBLE_COLLECTIONS_PATHS: "../../../../..:~/.ansible/collections"
+  inventory:
+    host_vars:
+      t_CA:
+        ansible_python_interpreter: /usr/bin/python3
 verifier:
   name: ansible
   lint:
