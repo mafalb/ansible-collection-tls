@@ -1,11 +1,23 @@
 # vim: set ft=yaml ts=2 expandtab:
 ---
 
+- name: get modulus of {{ key }}
+  command: openssl rsa -modulus -in {{ key }} -noout
+  register: _key_modulus
+  changed_when: false
+
 - name: verify CSR
   when:
   - csr is defined
   - key is defined
   include_tasks:
     file: csr.yml
+
+- name: verify cert
+  when:
+  - cert is defined
+  - key is defined
+  include_tasks:
+    file: cert.yml
 
 ...

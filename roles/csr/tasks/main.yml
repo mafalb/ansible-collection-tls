@@ -50,10 +50,6 @@
       that:
       - item in openssl_extended_key_usages
 
-- name: ansibles dependencies are present
-  import_role:
-    name: mafalb.ansible.node
-
 - name: directory for {{ alias }} does exist
   when:
   - csr_dir is defined or alias|dirname != ""
@@ -72,11 +68,11 @@
 
 - name: CSR for {{ alias }} is present (existing will be overwritten)
   when: csr_overwrite is defined
-  command: openssl req -new -utf8 -key {{ tls_default_key_dir + '/' + key_file|default(alias + '.key') }} -out {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr -config {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.cnf
+  command: openssl req -new -utf8 -key {{ key_dir|default(tls_default_key_dir) + '/' + key_file|default(alias + '.key') }} -out {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr -config {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.cnf
 
 - name: CSR for {{ alias }} is present
   when: csr_overwrite is not defined
-  command: openssl req -new -utf8 -key {{ tls_default_key_dir + '/' + key_file|default(alias + '.key') }} -out {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr -config {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.cnf
+  command: openssl req -new -utf8 -key {{ key_dir|default(tls_default_key_dir) + '/' + key_file|default(alias + '.key') }} -out {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr -config {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.cnf
   args:
     creates: "{{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr"
 
@@ -85,6 +81,6 @@
     name: mafalb.tls.verify
   vars:
     csr: "{{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr"
-    key: "{{ tls_default_key_dir + '/' + key_file|default(alias + '.key') }}"
+    key: "{{ key_dir|default(tls_default_key_dir) + '/' + key_file|default(alias + '.key') }}"
 
 ...

@@ -1,30 +1,20 @@
 # vim: set ft=yaml ts=2 expandtab:
 ---
 
-- name: Converge
+- name: dependencies
   hosts: all
+  roles:
+  - role: mafalb.ansible.node
+  - role: mafalb.tls.cfg
+  
+- name: create key
+  hosts: all,!ca
   environment:
     http_proxy: "{{ lookup('env', 'http_proxy') }}"
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
     no_proxy: "{{ lookup('env', 'no_proxy') }}"
 
-  pre_tasks:
-
-  - name: key is present
-    copy:
-      src: testkey.key
-      dest: /tmp/
-
   roles:
-
-  - role: mafalb.tls.csr
-    alias: testkey
-    key_file: /tmp/testkey.key
-    x509_cn: testkey
-    x509_organization: bla
-    x509_locality: Vienna
-    x509_province: Vienna
-    x509_country: AT
 
   - role: mafalb.tls.key
     alias: test1.example.com-20200114
@@ -40,6 +30,16 @@
     alias: key/blubb/test4.example.com-20200114
     key_dir: /tmp
 
+
+- name: Converge csr
+  hosts: all,!ca
+  environment:
+    http_proxy: "{{ lookup('env', 'http_proxy') }}"
+    https_proxy: "{{ lookup('env', 'https_proxy') }}"
+    no_proxy: "{{ lookup('env', 'no_proxy') }}"
+
+  roles:
+
   - role: mafalb.tls.csr
     alias: test1.example.com-20200114
     x509_cn: test1.example.com
@@ -54,6 +54,15 @@
     alias: another_csrdir/test2.example.com-20200114
     key_file: another_keydir/test2.example.com-20200114.key
     x509_cn: test2.example.com
+    x509_organization: bla
+    x509_locality: Vienna
+    x509_province: Vienna
+    x509_country: AT
+
+  - role: mafalb.tls.csr
+    alias: testkey
+    key_file: /tmp/test3.example.com-20200114.key
+    x509_cn: test1
     x509_organization: bla
     x509_locality: Vienna
     x509_province: Vienna
@@ -77,5 +86,123 @@
     x509_locality: Vienna
     x509_province: Vienna
     x509_country: AT
+
+- name: create CA
+  hosts: all,!t_centos6
+  environment:
+    http_proxy: "{{ lookup('env', 'http_proxy') }}"
+    https_proxy: "{{ lookup('env', 'https_proxy') }}"
+    no_proxy: "{{ lookup('env', 'no_proxy') }}"
+
+  roles:
+
+  - role: mafalb.tls.ca
+    alias: root_ca_1
+    x509_cn: Root CA 1
+    x509_organization: Test CA Organization
+    x509_locality: Wien
+    x509_province: Wien
+    x509_country: AT
+    key_dir: /tmp/root_ca_1
+    csr_dir: /tmp/root_ca_1
+    cert_dir: /tmp/root_ca_1
+
+  - role: mafalb.tls.ca
+    alias: signing_ca_1
+    x509_cn: Signing CA 1
+    x509_organization: Test CA Organization
+    x509_locality: Wien
+    x509_province: Wien
+    x509_country: AT
+    signing_key: /tmp/root_ca_1/root_ca_1.key
+    signing_cert: /tmp/root_ca_1/root_ca_1.cert
+    key_dir: /tmp/signing_ca_1
+    csr_dir: /tmp/signing_ca_1
+    cert_dir: /tmp/signing_ca_1
+
+
+- name: test3.example.com
+  hosts: all,!ca,!t_centos6
+  environment:
+    http_proxy: "{{ lookup('env', 'http_proxy') }}"
+    https_proxy: "{{ lookup('env', 'https_proxy') }}"
+    no_proxy: "{{ lookup('env', 'no_proxy') }}"
+
+  tasks:
+
+  - name: test3.example.com cert is present
+    openssl_certificate:
+      path: "{{ tls_default_cert_dir }}/test3.example.com.cert"
+      csr_path: /tmp/another/csrdir/test3.example.com-20200114.csr
+      ownca_path: /tmp/signing_ca_1/signing_ca_1.cert
+      ownca_privatekey_path: /tmp/signing_ca_1/signing_ca_1.key
+      provider: ownca
+
+
+- name: test1.example.com
+  hosts: all,!ca
+  environment:
+    http_proxy: "{{ lookup('env', 'http_proxy') }}"
+    https_proxy: "{{ lookup('env', 'https_proxy') }}"
+    no_proxy: "{{ lookup('env', 'no_proxy') }}"
+
+  tasks:
+
+  - name: fetch the csr
+    fetch:
+      src: "{{ tls_default_cert_dir }}/test1.example.com-20200114.csr"
+      flat: true
+      dest: files/testcert2/{{ ansible_hostname }}/test1.example.com-20200114.csr
+
+  - name: create per hostname directory
+    delegate_to: t_CA
+    file:
+      path: /tmp/signing_ca_1/{{ ansible_hostname }}
+      state: directory
+
+  - name: copy the csr to CA
+    delegate_to: t_CA
+    copy:
+      src: files/testcert2/{{ ansible_hostname }}/test1.example.com-20200114.csr
+      dest: /tmp/signing_ca_1/{{ ansible_hostname }}/
+
+  - name: test1.example.com cert is present
+    delegate_to: t_CA
+    openssl_certificate:
+      path: /tmp/signing_ca_1/test1.example.com.cert
+      csr_path: /tmp/signing_ca_1/{{ ansible_hostname }}/test1.example.com-20200114.csr
+      ownca_path: /tmp/signing_ca_1/signing_ca_1.cert
+      ownca_privatekey_path: /tmp/signing_ca_1/signing_ca_1.key
+      provider: ownca
+
+- name: Converge test1.example.com
+  hosts: all
+  environment:
+    http_proxy: "{{ lookup('env', 'http_proxy') }}"
+    https_proxy: "{{ lookup('env', 'https_proxy') }}"
+    no_proxy: "{{ lookup('env', 'no_proxy') }}"
+
+  pre_tasks:
+
+  - name: fetch the certificate
+    loop:
+    - /tmp/signing_ca_1/test1.example.com.cert
+    - /tmp/signing_ca_1/signing_ca_1.cert
+    - /tmp/root_ca_1/root_ca_1.cert
+    fetch:
+      src: "{{ item }}"
+      flat: true
+      dest: files/testcert1/{{ ansible_hostname }}/{{ item|basename }}
+
+  roles:
+
+  - role: mafalb.tls.certificate
+    alias: test1.example.com
+    cert: files/testcert1/{{ ansible_hostname }}/test1.example.com.cert
+    key: test1.example.com.key
+    chain:
+    - files/testcert1/{{ ansible_hostname }}/signing_ca_1.cert
+    root:
+    - files/testcert1/{{ ansible_hostname }}/root_ca_1.cert
 
 ...
