@@ -18,12 +18,12 @@ platforms:
     image: ubuntu:xenial
   - name: t_ubuntu18
     image: ubuntu:bionic
-  - name: t_ubuntu20
-    image: ubuntu:focal
   - name: t_CA
     image: centos:8
     groups:
     - ca
+#  - name: t_ubuntu20
+#    image: ubuntu:focal
 #  - name: t_rawhide
 #    image: fedora:rawhide
 
