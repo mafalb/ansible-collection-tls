@@ -6,7 +6,7 @@
   roles:
   - role: mafalb.ansible.node
   - role: mafalb.tls.cfg
-  
+
 - name: create key
   hosts: all,!ca
   environment:
@@ -169,14 +169,14 @@
   - name: test1.example.com cert is present
     delegate_to: t_CA
     openssl_certificate:
-      path: /tmp/signing_ca_1/test1.example.com.cert
+      path: /tmp/signing_ca_1/{{ ansible_hostname }}/test1.example.com.cert
       csr_path: /tmp/signing_ca_1/{{ ansible_hostname }}/test1.example.com-20200114.csr
       ownca_path: /tmp/signing_ca_1/signing_ca_1.cert
       ownca_privatekey_path: /tmp/signing_ca_1/signing_ca_1.key
       provider: ownca
 
 - name: Converge test1.example.com
-  hosts: all
+  hosts: all,!ca
   environment:
     http_proxy: "{{ lookup('env', 'http_proxy') }}"
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
@@ -185,8 +185,9 @@
   pre_tasks:
 
   - name: fetch the certificate
+    delegate_to: t_CA
     loop:
-    - /tmp/signing_ca_1/test1.example.com.cert
+    - /tmp/signing_ca_1/{{ ansible_hostname }}/test1.example.com.cert
     - /tmp/signing_ca_1/signing_ca_1.cert
     - /tmp/root_ca_1/root_ca_1.cert
     fetch:
@@ -199,7 +200,7 @@
   - role: mafalb.tls.certificate
     alias: test1.example.com
     cert: files/testcert1/{{ ansible_hostname }}/test1.example.com.cert
-    key: test1.example.com.key
+    key: test1.example.com-20200114.key
     chain:
     - files/testcert1/{{ ansible_hostname }}/signing_ca_1.cert
     root:

@@ -1,11 +1,6 @@
 # vim: set ft=yaml ts=2 expandtab:
 ---
 
-- name: OS specific config
-  include_role:
-    name: mafalb.tls.cfg
-    public: true
-
 - name: assertions
   assert:
     that:

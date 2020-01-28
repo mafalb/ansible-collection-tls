@@ -9,6 +9,6 @@
 - name: Assertions for {{ cert }}
   assert:
     that:
-    - _cert_modulus.stdout == _key_modulus_2.stdout
+    - _cert_modulus.stdout == _key_modulus.stdout
 
 ...

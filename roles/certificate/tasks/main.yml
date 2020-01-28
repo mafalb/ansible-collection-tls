@@ -6,11 +6,6 @@
   - never
   - debug
 
-- name: OS specific config
-  include_role:
-    name: mafalb.tls.cfg
-    public: true
-
 - name: include_tasks
   include_tasks:
     file: "{{ state|default('present') }}.yml"
