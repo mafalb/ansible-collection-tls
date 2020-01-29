@@ -1,0 +1,48 @@
+# vim: set ft=yaml ts=2 expandtab:
+---
+
+- name: assertions
+  assert:
+    that:
+      - cert_dir|default(tls_default_cert_dir) is defined
+      - key_dir|default(tls_default_key_dir) is defined
+      - alias is defined
+
+- name: key for {{ alias }} is present
+  include_role:
+    name: mafalb.tls.key
+  vars:
+    alias: "{{ alias }}-{{ now }}"
+    alias2: "{{ alias }}-{{ now }}"
+
+- name: CSR for {{ alias }} is present
+  include_role:
+    name: mafalb.tls.csr
+  vars:
+    alias: "{{ alias }}-{{ now }}"
+
+- name: Create a challenge for {{ alias }}
+  acme_certificate:
+    account_key_src: "{{ acme_account_key }}"
+    csr: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}-{{ now }}.csr"
+    dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}-{{ now }}.cert"
+    fullchain_dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}-{{ now }}.fullchain.pem"
+  register: _acme_challenge
+  environment: "{{ proxy|default(omit) }}"
+
+- debug:
+    var: _acme_challenge
+  tags:
+  - never
+  - debug
+
+- name: Create a challenge for {{ alias }}
+  acme_certificate:
+    account_key_src: "{{ acme_account_key }}"
+    csr: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}-{{ now }}.csr"
+    dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}-{{ now }}.cert"
+    fullchain_dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}-{{ now }}.fullchain.pem"
+    data: "{{ acme_challenge }}"
+  environment: "{{ proxy|default(omit) }}"
+
+...

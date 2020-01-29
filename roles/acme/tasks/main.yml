@@ -1,0 +1,95 @@
+# vim: set ft=yaml ts=2 expandtab:
+---
+
+- debug:
+    var: tls_days_remaining * 86400
+  tags:
+  - never
+  - debug
+
+- name: assertions
+  assert:
+    that:
+    - cert_dir|default(tls_default_cert_dir) is defined
+    - key_dir|default(tls_default_key_dir) is defined
+    - acme_alias is defined
+    - x509_cn is defined
+    - x509_sans|default([])|type_debug == 'list'
+    - acme_challenge_path|default(acme_default_challenge_path) is defined
+
+- name: check days
+  changed_when: false
+  failed_when: false
+  check_mode: false
+  command: openssl x509 -noout -in {{ cert_dir|default(tls_default_cert_dir) }}/{{ acme_alias }}.cert -checkend {{ tls_days_remaining * 86400 }}
+  register: _need_renew
+
+- debug:
+    var: _need_renew
+  tags:
+  - never
+  - debug
+
+- block:
+
+  - name: key for {{ acme_alias }} is present
+    include_role:
+      name: mafalb.tls.key
+    vars:
+      alias: "{{ acme_alias }}-{{ now }}"
+  
+  - name: CSR for {{ alias }} is present
+    include_role:
+      name: mafalb.tls.csr
+    vars:
+      alias: "{{ acme_alias }}-{{ now }}"
+  
+  - name: verify {{ acme_alias }}
+    include_role:
+      name: mafalb.tls.verify
+    vars:
+      key: "{{ key_dir|default(tls_default_key_dir) }}/{{ acme_alias }}-{{ now }}.key"
+      csr: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ acme_alias }}-{{ now }}.csr"
+
+  - name: Create a challenge for {{ acme_alias }}
+    acme_certificate:
+      account_key_src: "{{ acme_account_key }}"
+      csr: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ acme_alias }}-{{ now }}.csr"
+      dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ acme_alias }}-{{ now }}.cert"
+    register: _acme_challenge
+    environment: "{{ proxy|default(omit) }}"
+  
+  - debug:
+      var: _acme_challenge
+    tags:
+    - never
+    - debug
+  
+  - name: copy challenge
+    when: _acme_challenge is changed
+    loop: "{{ [ x509_cn ] + x509_sans|default([]) }}"
+    copy:
+      content: "{{ _acme_challenge['challenge_data'][item]['http-01']['resource_value'] }}"
+      dest: "{{ acme_challenge_path|default(acme_default_challenge_path) }}/{{ _acme_challenge['challenge_data'][item]['http-01']['resource']|basename }}"
+
+  - name: get {{ acme_alias }}
+    acme_certificate:
+      account_key_src: "{{ acme_account_key }}"
+      csr: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ acme_alias }}-{{ now }}.csr"
+      dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ acme_alias }}-{{ now }}.cert"
+      fullchain_dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ acme_alias }}-{{ now }}.fullchain.pem"
+      chain_dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ acme_alias }}-{{ now }}.chain.pem"
+      retrieve_all_alternates: true
+      data: "{{ _acme_challenge }}"
+    environment: "{{ proxy|default(omit) }}"
+
+  - name: verify {{ acme_alias }}
+    include_role:
+      name: mafalb.tls.verify
+    vars:
+      key: "{{ cert_dir|default(tls_default_key_dir) }}/{{ acme_alias }}-{{ now }}.key"
+      cert: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ acme_alias }}-{{ now }}.cert"
+
+  when: _need_renew.rc == 1
+
+...

@@ -12,10 +12,6 @@
   assert:
     that:
     - x509_cn is defined
-    - x509_organization is defined
-    - x509_locality is defined
-    - x509_province is defined
-    - x509_country is defined
 
 - name: check x509_sans
   when: x509_sans is defined

@@ -9,6 +9,18 @@
     - key_size is defined
     - key_type in ['RSA']
 
+- debug:
+    var: alias
+  tags:
+  - never
+  - debug
+
+- debug:
+    var: alias2
+  tags:
+  - never
+  - debug
+
 - name: directory for {{ alias }} is present
   when:
   - key_dir is defined or alias|dirname != ""

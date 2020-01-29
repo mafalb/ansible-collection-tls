@@ -1,0 +1,6 @@
+# vim: set ft=yaml ts=2 expandtab:
+---
+
+acme_default_challenge_path: /var/www/html/.well-known/acme-challenge/
+
+...

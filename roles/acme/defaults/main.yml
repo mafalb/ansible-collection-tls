@@ -1,0 +1,8 @@
+# vim: set ft=yaml ts=2 expandtab:
+---
+
+tls_days_remaining: 30
+now: "{{ '%Y%m%d'|strftime }}"
+acme_account_key: "{{ key_dir|default(tls_default_key_dir) }}/acme_account.key"
+
+...

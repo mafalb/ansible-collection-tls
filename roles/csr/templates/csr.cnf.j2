@@ -12,10 +12,18 @@ req_extensions          = server_reqext         # Desired extensions
 
 [ server_dn ]
 CN={{ x509_cn }}
+{% if x509_organization is defined %}
 O={{ x509_organization }}
+{% endif %}
+{% if x509_locality is defined %}
 L={{ x509_locality }}
+{% endif %}
+{% if x509_province is defined %}
 ST={{ x509_province }}
+{% endif %}
+{% if x509_country is defined %}
 C={{ x509_country }}
+{% endif %}
 
 [ ca_reqext ]
 keyUsage                = critical,keyCertSign,cRLSign
