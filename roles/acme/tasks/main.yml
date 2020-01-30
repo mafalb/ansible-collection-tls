@@ -53,9 +53,13 @@
 
   - name: Create a challenge for {{ acme_alias }}
     acme_certificate:
+      acme_version: 2
+      acme_directory: "{{ acme_directory }}"
       account_key_src: "{{ acme_account_key }}"
+      modify_account: false
       csr: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ acme_alias }}-{{ now }}.csr"
-      dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ acme_alias }}-{{ now }}.cert"
+      retrieve_all_alternates: true
+      dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ acme_alias }}.cert"
     register: _acme_challenge
     environment: "{{ proxy|default(omit) }}"
   
@@ -66,7 +70,9 @@
     - debug
   
   - name: copy challenge
-    when: _acme_challenge is changed
+    when:
+    - _acme_challenge.challenge_data is defined
+    - _acme_challenge.challenge_data
     loop: "{{ [ x509_cn ] + x509_sans|default([]) }}"
     copy:
       content: "{{ _acme_challenge['challenge_data'][item]['http-01']['resource_value'] }}"
@@ -74,7 +80,10 @@
 
   - name: get {{ acme_alias }}
     acme_certificate:
+      acme_version: 2
+      acme_directory: "{{ acme_directory }}"
       account_key_src: "{{ acme_account_key }}"
+      modify_account: false
       csr: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ acme_alias }}-{{ now }}.csr"
       dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ acme_alias }}-{{ now }}.cert"
       fullchain_dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ acme_alias }}-{{ now }}.fullchain.pem"
@@ -82,6 +91,7 @@
       retrieve_all_alternates: true
       data: "{{ _acme_challenge }}"
     environment: "{{ proxy|default(omit) }}"
+    register: _acme_cert
 
   - name: verify {{ acme_alias }}
     include_role:
@@ -89,6 +99,12 @@
     vars:
       key: "{{ cert_dir|default(tls_default_key_dir) }}/{{ acme_alias }}-{{ now }}.key"
       cert: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ acme_alias }}-{{ now }}.cert"
+
+  - debug:
+      var: _acme_cert
+    tags:
+    - never
+    - debug
 
   when: _need_renew.rc == 1
 
