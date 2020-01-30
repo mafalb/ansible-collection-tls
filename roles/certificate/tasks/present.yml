@@ -4,13 +4,17 @@
 - name: assertions
   assert:
     that:
-      - chain|type_debug == 'list'
-      - root|type_debug == 'list'
-      - cert is defined
+      - chain|default([])|type_debug == 'list'
+      - remote_chain|default([])|type_debug == 'list'
+      - root|default([])|type_debug == 'list'
       - alias is defined
-      - key is defined
+      - cert is defined or remote_cert is defined
+      - not (cert is defined and remote_cert is defined)
+      - key is defined or remote_key is defined
+      - not (key is defined and remote_key is defined)
 
 - name: "{{ alias }}.cert is present"
+  when: cert is defined
   copy:
     src: "{{ playbook_dir }}/{{ cert }}"
     dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.cert"
@@ -18,9 +22,20 @@
     backup: true
   notify: check for changed cert
 
+- name: "{{ alias }}.cert is present"
+  when: remote_cert is defined
+  copy:
+    remote_src: true
+    src: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ remote_cert }}"
+    dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.cert"
+    mode: 00644
+    backup: true
+
+  notify: check for changed cert
 - block:
 
   - name: CA certificates for {{ alias }} does exist
+    when: root is defined
     loop: "{{ root }}"
     copy:
       src: "{{ playbook_dir }}/{{ item }}"
@@ -30,22 +45,33 @@
       index_var: i
   
   - name: "{{ alias }}.root.pem is present"
+    when: root is defined
     template:
       src: root.j2
       dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.root.pem"
       backup: true
 
   - name: "{{ alias }}.root.cert is absent"
+    when: root is defined
     file:
       path: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.root.cert"
       state: absent
 
-  - name: intermediate certificates are present
+  - name: intermediate certificates for {{ alias }} are present
+    when: chain is defined
     loop: "{{ chain }}"
     copy:
       src: "{{ item }}"
       dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ (item|basename|splitext)[0] }}.cert"
       
+  - name: intermediate certificates for {{ alias }} are present
+    when: remote_chain is defined
+    loop: "{{ remote_chain }}"
+    copy:
+      remote_src: true
+      src: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ item }}"
+      dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ (item|basename|splitext)[0] }}.cert"
+
 - debug: var=key
   no_log: true
   tags:
@@ -55,24 +81,41 @@
 - name: "{{ alias }}.key is present"
   block:
 
-  - name: key does exist
+  - name: key for {{ alias }} does exist
     copy:
+      remote_src: true
       src: "{{ private_dir|default(tls_default_key_dir) }}/{{ key }}"
       dest: "{{ private_dir|default(tls_default_key_dir) }}/{{ alias }}.key"
-      remote_src: true
       backup: true
       mode: "{{ tls_key_mode }}"
     notify: check for changed key
 
-  - name: read in key
+  - name: read in {{ key }}
     no_log: true
     command: cat "{{ private_dir|default(tls_default_key_dir) }}/{{ key }}"
     check_mode: false
     changed_when: false
     register: __key
 
+- name: read in chain {{ alias }}
+  when: remote_chain is defined
+  loop: "{{ chain }}"
+  check_mode: false
+  changed_when: false
+  slurp:
+    src: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ item }}"
+  register: __chain
+
+- name: read in cert for {{ alias }}
+  when: remote_cert is defined
+  check_mode: false
+  changed_when: false
+  slurp:
+    src: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ remote_cert }}"
+  register: _tls_cert
+
 - name: "{{ alias }}.pem is present"
-  no_log: true
+  no_log: false
   template:
     src: pem.j2
     dest: "{{ private_dir|default(tls_default_key_dir) }}/{{ alias }}.pem"
@@ -123,7 +166,7 @@
     check_mode: false
     changed_when: false
 
-  - name: assertions
+  - name: assert {{ alias }}
     assert:
       that:
       - _cert_verify.rc == 0

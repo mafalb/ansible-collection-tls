@@ -206,4 +206,13 @@
     root:
     - files/testcert1/{{ ansible_hostname }}/root_ca_1.cert
 
+  - role: mafalb.tls.certificate
+    alias: test1_1.example.com
+    remote_cert: test1.example.com.cert
+    key: test1.example.com-20200114.key
+    remote_chain:
+    - test1.example.com.chain.pem
+    root:
+    - files/testcert1/{{ ansible_hostname }}/root_ca_1.cert
+
 ...

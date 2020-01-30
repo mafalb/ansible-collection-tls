@@ -54,8 +54,9 @@
     key: /tmp/signing_ca_1/signing_ca_1.key
     cert: /tmp/signing_ca_1/signing_ca_1.cert
 
-- name: Verify test3.example.com
-  hosts: all,!ca,!t_centos6
+
+- name: Verify test1.example.com
+  hosts: all,!ca
   environment:
     http_proxy: "{{ lookup('env', 'http_proxy') }}"
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
@@ -63,10 +64,16 @@
 
   roles:
 
-  - name: verify test3.example.com
+  - name: verify test1.example.com
     role: mafalb.tls.verify
-    csr: /tmp/another/csrdir/test3.example.com-20200114.csr
-    key: /tmp/test3.example.com-20200114.key
-    cert: "{{ tls_default_cert_dir }}/test3.example.com.cert"
+    csr: "{{ tls_default_cert_dir }}/test1.example.com-20200114.csr"
+    key: "{{ tls_default_key_dir }}/test1.example.com.key"
+    cert: "{{ tls_default_cert_dir }}/test1.example.com.cert"
+
+  - name: verify test1_1.example.com
+    role: mafalb.tls.verify
+    csr: "{{ tls_default_cert_dir }}/test.example.com-20200114.csr"
+    key: "{{ tls_default_key_dir }}/test1_1.example.com.key"
+    cert: "{{ tls_default_cert_dir }}/test1_1.example.com.cert"
 
 ...
