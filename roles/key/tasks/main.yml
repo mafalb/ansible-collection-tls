@@ -15,12 +15,6 @@
   - never
   - debug
 
-- debug:
-    var: alias2
-  tags:
-  - never
-  - debug
-
 - name: directory for {{ alias }} is present
   when:
   - key_dir is defined or alias|dirname != ""
