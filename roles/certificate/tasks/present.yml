@@ -64,14 +64,6 @@
       src: "{{ item }}"
       dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ (item|basename|splitext)[0] }}.cert"
       
-  - name: intermediate certificates for {{ alias }} are present
-    when: remote_chain is defined
-    loop: "{{ remote_chain }}"
-    copy:
-      remote_src: true
-      src: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ item }}"
-      dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ (item|basename|splitext)[0] }}.cert"
-
 - debug: var=key
   no_log: true
   tags:
@@ -99,12 +91,18 @@
 
 - name: read in chain {{ alias }}
   when: remote_chain is defined
-  loop: "{{ chain }}"
+  loop: "{{ remote_chain }}"
   check_mode: false
   changed_when: false
   slurp:
     src: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ item }}"
   register: __chain
+
+- debug:
+    var: __chain
+  tags:
+  - never
+  - debug
 
 - name: read in cert for {{ alias }}
   when: remote_cert is defined
