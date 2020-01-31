@@ -5,6 +5,7 @@
   assert:
     that:
       - chain|default([])|type_debug == 'list'
+      - not (chain is defined and remote_chain is defined)
       - remote_chain|default([])|type_debug == 'list'
       - root|default([])|type_debug == 'list'
       - alias is defined
