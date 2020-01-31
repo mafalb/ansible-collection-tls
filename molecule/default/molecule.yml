@@ -29,6 +29,9 @@ platforms:
 
 provisioner:
   name: ansible
+  ansible_args:
+    - --tags=all,debug
+    - --diff
   config_options:
     defaults:
       gathering: smart
