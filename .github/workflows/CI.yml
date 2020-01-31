@@ -10,7 +10,7 @@ on:
   - cron: '40 12 * * 6'
 
 jobs:
-  build:
+  tls:
 
     runs-on: ubuntu-18.04
 
