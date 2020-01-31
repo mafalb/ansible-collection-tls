@@ -25,7 +25,7 @@ jobs:
         run: ansible-galaxy collection install mafalb.ansible
 
       - name: grep for forgotten no_log
-        run: 'grep -r "no_log: false" .'
+        run: '! grep -r "no_log: false" .'
 
       - name: install molecule
         run: ansible-playbook -D install_molecule.yml
