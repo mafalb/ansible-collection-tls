@@ -77,7 +77,7 @@
   - name: key for {{ alias }} does exist
     copy:
       remote_src: true
-      src: "{{ private_dir|default(tls_default_key_dir) }}/{{ remote_key }}"
+      src: "{{ private_dir|default(tls_default_key_dir) }}/{{ remote_key|default(key) }}"
       dest: "{{ private_dir|default(tls_default_key_dir) }}/{{ alias }}.key"
       backup: true
       mode: "{{ tls_key_mode }}"
@@ -85,7 +85,7 @@
 
   - name: read in {{ key }}
     no_log: true
-    command: cat "{{ private_dir|default(tls_default_key_dir) }}/{{ remote_key }}"
+    command: cat "{{ private_dir|default(tls_default_key_dir) }}/{{ key|default(remote_key) }}"
     check_mode: false
     changed_when: false
     register: __key
