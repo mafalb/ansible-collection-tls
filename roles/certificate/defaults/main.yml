@@ -2,6 +2,5 @@
 ---
 
 tls_key_mode: 00600
-chain: []
 
 ...

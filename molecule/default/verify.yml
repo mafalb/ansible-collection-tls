@@ -72,7 +72,7 @@
 
   - name: verify test1_1.example.com
     role: mafalb.tls.verify
-    csr: "{{ tls_default_cert_dir }}/test.example.com-20200114.csr"
+    csr: "{{ tls_default_cert_dir }}/test1.example.com-20200114.csr"
     key: "{{ tls_default_key_dir }}/test1_1.example.com.key"
     cert: "{{ tls_default_cert_dir }}/test1_1.example.com.cert"
 
