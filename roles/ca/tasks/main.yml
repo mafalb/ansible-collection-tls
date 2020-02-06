@@ -25,7 +25,7 @@
     privatekey_path: "{{ key_dir|default(tls_default_key_dir) }}/{{ alias }}.key"
     csr_path: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr"
     provider: selfsigned
-    selfsigned_not_after: '+' {{ ca_days }} + 'd'
+    selfsigned_not_after: +{{ ca_days }}d
 
 - name: Intermediate certificate is present
   when: signing_key is defined
@@ -35,7 +35,7 @@
     ownca_privatekey_path: "{{ signing_key }}"
     csr_path: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr"
     provider: ownca
-    ownca_not_after: '+' {{ ca_days }} + 'd'
+    ownca_not_after: +{{ ca_days }}d
 
 - name: Get information on generated certificate
   openssl_certificate_info:
