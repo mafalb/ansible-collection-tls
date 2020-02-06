@@ -1,0 +1,6 @@
+# vim: set ft=yaml ts=2 expandtab:
+---
+
+ca_days_valid: 3600
+
+...
