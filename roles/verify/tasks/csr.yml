@@ -5,6 +5,7 @@
   command: openssl req -modulus -in {{ csr }} -noout
   register: _csr_modulus
   changed_when: false
+  check_mode: false
 
 - name: Assertions for {{ csr }}
   assert:

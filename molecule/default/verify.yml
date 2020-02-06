@@ -76,4 +76,49 @@
     key: "{{ tls_default_key_dir }}/test1_1.example.com.key"
     cert: "{{ tls_default_cert_dir }}/test1_1.example.com.cert"
 
+  - name: verify test1_2.example.com
+    role: mafalb.tls.verify
+    csr: "{{ tls_default_cert_dir }}/test1.example.com-20200114.csr"
+    key: "{{ tls_default_key_dir }}/test1_2.example.com.key"
+    cert: "{{ tls_default_cert_dir }}/test1_2.example.com.cert"
+
+
+- name: Verify certificates
+  # CentOS 6 is too old for the openssl_certificate_info module
+  # cryptography is too old
+  hosts: all,!ca,!t_centos6
+  environment:
+    http_proxy: "{{ lookup('env', 'http_proxy') }}"
+    https_proxy: "{{ lookup('env', 'https_proxy') }}"
+    no_proxy: "{{ lookup('env', 'no_proxy') }}"
+
+  tasks:
+
+  - name: get info for certificates
+    loop:
+    - test1.example.com
+    - test3.example.com
+    changed_when: false
+    openssl_certificate_info:
+      path: "{{ tls_default_cert_dir }}/{{ item }}.cert"
+    register: _cert_info
+
+  - name: debug dates of certificates
+    loop:
+    - test1.example.com
+    - test3.example.com
+    debug:
+      var: _cert_info
+
+  - name: debug dates
+    loop: "{{ _cert_info.results }}"
+    debug:
+      msg: "{{ (item.not_after[:-1]|to_datetime('%Y%m%d%H%M%S') - item.not_before[:-1]|to_datetime('%Y%m%d%H%M%S')).days }}"
+
+  - name: assertions for certificates
+    loop: "{{ _cert_info.results }}"
+    assert:
+      that:
+      - (item.not_after[:-1]|to_datetime('%Y%m%d%H%M%S') - item.not_before[:-1]|to_datetime('%Y%m%d%H%M%S')).days == 825
+
 ...

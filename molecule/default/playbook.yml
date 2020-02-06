@@ -106,6 +106,7 @@
     key_dir: /tmp/root_ca_1
     csr_dir: /tmp/root_ca_1
     cert_dir: /tmp/root_ca_1
+    ca_days: 3650
 
   - role: mafalb.tls.ca
     alias: signing_ca_1
@@ -119,6 +120,7 @@
     key_dir: /tmp/signing_ca_1
     csr_dir: /tmp/signing_ca_1
     cert_dir: /tmp/signing_ca_1
+    ca_days: 400
 
 
 - name: test3.example.com
@@ -137,6 +139,7 @@
       ownca_path: /tmp/signing_ca_1/signing_ca_1.cert
       ownca_privatekey_path: /tmp/signing_ca_1/signing_ca_1.key
       provider: ownca
+      ownca_not_after: +825d
 
 
 - name: test1.example.com
@@ -174,6 +177,7 @@
       ownca_path: /tmp/signing_ca_1/signing_ca_1.cert
       ownca_privatekey_path: /tmp/signing_ca_1/signing_ca_1.key
       provider: ownca
+      ownca_not_after: +825d
 
 - name: Converge test1.example.com
   hosts: all,!ca
@@ -210,6 +214,15 @@
     alias: test1_1.example.com
     remote_cert: test1.example.com.cert
     key: test1.example.com-20200114.key
+    remote_chain:
+    - test1.example.com.chain.pem
+    root:
+    - files/testcert1/{{ ansible_hostname }}/root_ca_1.cert
+
+  - role: mafalb.tls.certificate
+    alias: test1_2.example.com
+    remote_cert: test1.example.com.cert
+    remote_key: test1_1.example.com.key
     remote_chain:
     - test1.example.com.chain.pem
     root:

@@ -5,6 +5,7 @@
   command: openssl rsa -modulus -in {{ key }} -noout
   register: _key_modulus
   changed_when: false
+  check_mode: false
 
 - name: verify CSR
   when:
