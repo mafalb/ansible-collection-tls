@@ -17,7 +17,7 @@ tags:
 - tls
 - certificate
 - key
-- CSR
+- csr
 - pem
 - openssl
 
