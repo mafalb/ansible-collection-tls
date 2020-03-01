@@ -20,9 +20,9 @@ galaxy_info:
     - focal
 
   galaxy_tags:
-  - SSL
-  - TLS
-  - CSR
+  - ssl
+  - tls
+  - csr
 
 dependencies: []
 

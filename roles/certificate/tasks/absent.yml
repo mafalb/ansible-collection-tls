@@ -24,7 +24,7 @@
       paths: "{{ cert_dir|default(tls_default_cert_dir) }}"
       patterns: "{{ alias }}.root?.cert"
     register: _files_to_delete
-  
+
   - debug:
       var: _files_to_delete
     tags:

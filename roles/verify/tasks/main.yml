@@ -18,7 +18,6 @@
   when:
   - cert is defined
   - key is defined
-  include_tasks:
-    file: cert.yml
+  include_tasks: cert.yml
 
 ...

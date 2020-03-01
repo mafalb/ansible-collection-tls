@@ -30,10 +30,10 @@ jobs:
       - name: install molecule
         run: ansible-playbook -D install_molecule.yml
 
-      - name: build test images
+      - name: manual lint
         run: |
           source ~/.virtualenvs/molecule/bin/activate
-          PY_COLORS=1 molecule create
+          ansible-lint roles/*
 
       - name: run molecule tests
         run: |
