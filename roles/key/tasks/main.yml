@@ -17,7 +17,7 @@
 
 - name: directory for {{ alias }} is present
   when:
-  - key_dir is defined or alias|dirname != ""
+  - key_dir is defined or alias|dirname|length > 0
   file:
     path: "{{ key_dir|default(tls_default_key_dir) }}/{{ alias|dirname }}"
     state: directory

@@ -37,13 +37,13 @@
       name: mafalb.tls.key
     vars:
       alias: "{{ acme_alias }}-{{ now }}"
-  
+
   - name: CSR for {{ alias }} is present
     include_role:
       name: mafalb.tls.csr
     vars:
       alias: "{{ acme_alias }}-{{ now }}"
-  
+
   - name: verify {{ acme_alias }}
     include_role:
       name: mafalb.tls.verify
@@ -62,13 +62,13 @@
       dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ acme_alias }}.cert"
     register: _acme_challenge
     environment: "{{ proxy|default(omit) }}"
-  
+
   - debug:
       var: _acme_challenge
     tags:
     - never
     - debug
-  
+
   - name: copy challenge
     when:
     - _acme_challenge.challenge_data is defined

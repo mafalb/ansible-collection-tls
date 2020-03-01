@@ -17,7 +17,8 @@
   when: x509_sans is defined
   block:
 
-  - assert:
+  - name: assert that SANs are a list
+    assert:
       that:
       - x509_sans|type_debug == 'list'
 
@@ -44,7 +45,7 @@
 
 - name: directory for {{ alias }} does exist
   when:
-  - csr_dir is defined or alias|dirname != ""
+  - csr_dir is defined or alias|dirname|length > 0
   file:
     path: "{{ csr_dir|default(tls_default_cert_dir) }}/{{ alias|dirname }}"
     state: directory
@@ -60,11 +61,11 @@
 
 - name: CSR for {{ alias }} is present (existing will be overwritten)
   when: csr_overwrite is defined
-  command: openssl req -new -utf8 -key {{ key_dir|default(tls_default_key_dir) + '/' + key_file|default(alias + '.key') }} -out {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr -config {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.cnf
+  command: openssl req -new -utf8 -key {{ key_dir|default(tls_default_key_dir) + '/' + key_file|default(alias + '.key') }} -out {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr -config {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.cnf # noqa 204
 
 - name: CSR for {{ alias }} is present
   when: csr_overwrite is not defined
-  command: openssl req -new -utf8 -key {{ key_dir|default(tls_default_key_dir) + '/' + key_file|default(alias + '.key') }} -out {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr -config {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.cnf
+  command: openssl req -new -utf8 -key {{ key_dir|default(tls_default_key_dir) + '/' + key_file|default(alias + '.key') }} -out {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr -config {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.cnf # noqa 204
   args:
     creates: "{{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr"
 

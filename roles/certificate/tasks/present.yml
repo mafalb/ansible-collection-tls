@@ -44,7 +44,7 @@
       backup: true
     loop_control:
       index_var: i
-  
+
   - name: "{{ alias }}.root.pem is present"
     when: root is defined
     template:
@@ -64,7 +64,7 @@
     copy:
       src: "{{ item }}"
       dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ (item|basename|splitext)[0] }}.cert"
-      
+
 - debug: var=key|default(remote_key)
   no_log: true
   tags:
@@ -144,13 +144,13 @@
     register: _cert_modulus
     changed_when: false
     check_mode: false
-  
+
   - name: get modulus of key for {{ alias }}
     command: openssl rsa -modulus -in {{ private_dir|default(tls_default_key_dir + '/' + alias + '.key') }}  -noout
     register: _key_modulus
     changed_when: false
     check_mode: false
-  
+
   - name: assertions
     assert:
       that:
@@ -160,7 +160,7 @@
   block:
 
   - name: openssl verify for {{ alias }}
-    command: openssl verify -CAfile {{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.root.pem -untrusted {{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.chain.pem {{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.cert
+    command: openssl verify -CAfile {{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.root.pem -untrusted {{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.chain.pem {{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.cert # noqa 204
     register: _cert_verify
     check_mode: false
     changed_when: false
