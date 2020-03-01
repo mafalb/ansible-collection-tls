@@ -33,6 +33,6 @@ homepage: https://github.com/mafalb/ansible-collection-tls
 issues: https://github.com/mafalb/ansible-collection-tls/issues
 
 dependencies:
-- mafalb.ansible
+  mafalb.ansible: "*"
 
 ...
