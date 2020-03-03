@@ -3,7 +3,7 @@
 
 galaxy_info:
   author: Markus Falb <markus.falb@mafalb.at>
-  description: Ansible role for creating a certificate
+  description: Ansible role for creating a p12
   license: GPLv3
   min_ansible_version: 2.9
 
@@ -17,14 +17,12 @@ galaxy_info:
     versions:
     - xenial
     - bionic
-    - focal
 
   galaxy_tags:
-  - SSL
-  - TLS
+  - ssl
+  - tls
   - p12
 
-dependencies:
-- role: mafalb.tls.cfg
+dependencies: []
 
 ...

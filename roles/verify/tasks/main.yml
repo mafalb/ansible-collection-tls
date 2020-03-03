@@ -11,14 +11,12 @@
   when:
   - csr is defined
   - key is defined
-  include_tasks:
-    file: csr.yml
+  include_tasks: csr.yml
 
 - name: verify cert
   when:
   - cert is defined
   - key is defined
-  include_tasks:
-    file: cert.yml
+  include_tasks: cert.yml
 
 ...

@@ -17,9 +17,11 @@ tags:
 - tls
 - certificate
 - key
-- CSR
+- csr
 - pem
 - openssl
+
+repository: https://github.com/mafalb/ansible-collection-tls
 
 # The URL to any online docs
 documentation: https://github.com/mafalb/ansible-collection-tls
@@ -31,6 +33,6 @@ homepage: https://github.com/mafalb/ansible-collection-tls
 issues: https://github.com/mafalb/ansible-collection-tls/issues
 
 dependencies:
-- mafalb.ansible
+  mafalb.ansible: "*"
 
 ...
