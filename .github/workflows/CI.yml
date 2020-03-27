@@ -14,6 +14,56 @@ jobs:
 
     runs-on: ubuntu-18.04
 
+    strategy:
+
+      fail-fast: false
+
+      matrix:
+
+        target:
+        - centos_7
+        - centos_8
+        - centos_6
+        - ubuntu_1804
+        - ubuntu_1604
+        - fedora_31
+        - fedora_30
+
+        include:
+
+        - target: centos_7
+          distribution: centos
+          version: 7
+
+        - target: centos_8
+          distribution: centos
+          version: 8
+
+        - target: centos_6
+          distribution: centos
+          version: 6
+
+        - target: ubuntu_1804
+          distribution: ubuntu
+          version: bionic
+
+        - target: ubuntu_1604
+          distribution: ubuntu
+          version: xenial
+
+        - target: fedora_31
+          distribution: fedora
+          version: 31
+
+        - target: fedora_30
+          distribution: fedora
+          version: 30
+
+      env:
+        CI_CONTAINER_IMAGE: ${{ matrix.distribution }}
+        CI_CONTAINER_TAG: ${{ matrix.version }}
+        CI_CONTAINER_PRIVILEGED: true
+
     steps:
 
       - name: checkout collection
@@ -39,5 +89,6 @@ jobs:
         run: |
           source ~/.virtualenvs/molecule/bin/activate 
           PY_COLORS=1 molecule test
+          PY_COLORS=1 CI_CONTAINER_PRIVILEGED=$CI_CONTAINER_PRIVILEGED CI_CONTAINER_IMAGE=$CI_CONTAINER_IMAGE CI_CONTAINER_TAG=$CI_CONTAINER_TAG molecule test
 
 ...
