@@ -4,6 +4,5 @@
 - hosts: localhost
   roles:
     - role: mafalb.ansible.molecule
-      molecule_major_version: 2
 
 ...

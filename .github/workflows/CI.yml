@@ -78,12 +78,7 @@ jobs:
         run: '! grep -r "no_log: false" roles'
 
       - name: install molecule
-        run: ansible-playbook -D install_molecule.yml
-
-      - name: manual lint
-        run: |
-          source ~/.virtualenvs/molecule/bin/activate
-          ansible-lint roles/*
+        run: ansible-playbook -D molecule/install_molecule.yml
 
       - name: run molecule tests
         run: |
