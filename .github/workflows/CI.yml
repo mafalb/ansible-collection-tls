@@ -71,11 +71,21 @@ jobs:
         with:
           path: ansible_collections/mafalb/tls
       
-      - name: install mafalb.ansible
-        run: ansible-galaxy collection install mafalb.ansible
+      - name: checkout collection
+        uses: actions/checkout@v2
+        with:
+          path: ansible_collections/mafalb/ansible
+          repository: mafalb/ansible-collection-ansible
+          ref: dev
 
-      - name: grep for forgotten no_log
-        run: '! grep -r "no_log: false" roles'
+      - name: mv ansible
+        run: |
+          mkdir -p ~/.ansible/collections/ansible_collections/mafalb
+          mv ansible_collections/mafalb/ansible ~/.ansible/collections/ansible_collections/mafalb/
+
+#      - name: install dependencies
+#      #        run: ansible-galaxy collection install -r molecule/requirements.yml
+#
 
       - name: install molecule
         run: ansible-playbook -D molecule/install_molecule.yml
