@@ -59,10 +59,10 @@ jobs:
           distribution: fedora
           version: 30
 
-      env:
-        CI_CONTAINER_IMAGE: ${{ matrix.distribution }}
-        CI_CONTAINER_TAG: ${{ matrix.version }}
-        CI_CONTAINER_PRIVILEGED: true
+    env:
+      CI_CONTAINER_IMAGE: ${{ matrix.distribution }}
+      CI_CONTAINER_TAG: ${{ matrix.version }}
+      CI_CONTAINER_PRIVILEGED: true
 
     steps:
 
