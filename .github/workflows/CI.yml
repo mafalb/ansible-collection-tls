@@ -72,6 +72,7 @@ jobs:
           path: ansible_collections/mafalb/tls
       
       - name: checkout collection
+        if: false
         uses: actions/checkout@v2
         with:
           path: ansible_collections/mafalb/ansible
@@ -79,13 +80,13 @@ jobs:
           ref: dev
 
       - name: mv ansible
+        if: false
         run: |
           mkdir -p ~/.ansible/collections/ansible_collections/mafalb
           mv ansible_collections/mafalb/ansible ~/.ansible/collections/ansible_collections/mafalb/
 
-#      - name: install dependencies
-#      #        run: ansible-galaxy collection install -r molecule/requirements.yml
-#
+      - name: install dependencies
+        run: ansible-galaxy collection install -r molecule/requirements.yml
 
       - name: install molecule
         run: ansible-playbook -D molecule/install_molecule.yml
