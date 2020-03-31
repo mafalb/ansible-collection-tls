@@ -23,11 +23,60 @@
     state: directory
     recurse: true
 
-- name: "{{ alias }} is present"
-  openssl_privatekey:
-    path: "{{ key_dir|default(tls_default_key_dir) }}/{{ alias }}.key"
-    size: "{{ key_size }}"
-    type: "{{ key_type }}"
-    backup: true
+# for now only implemented for RSA keys
+#
+- name: check if key does exist
+  command: openssl rsa -in {{ key_dir|default(tls_default_key_dir) }}/{{ alias }}.key
+  changed_when: false
+  failed_when: false
+  no_log: true
+  register: _key_exists
+
+- name: debug _key_exists
+  debug: var=_key_exists
+  no_log: true
+  tags:
+  - never
+  - debug
+
+- name: get key if it already exist
+  command: openssl rsa -in {{ key_dir|default(tls_default_key_dir) }}/{{ alias }}.key
+  when: _key_exists.rc == 0
+  changed_when: false
+  no_log: true
+  register: _existing_key_content
+
+- name: debug _key_content
+  debug: var=_existing_key_content
+  no_log: true
+  tags:
+  - never
+  - debug
+
+- name: generate key for {{ alias }}
+  command: openssl genrsa {{ key_size }}
+  when:
+  - _key_exists.rc != 0
+  no_log: true
+  run_once: "{{ true if key_target_hosts is defined else false }}"
+  register: _key_content
+
+- name: debug _key_content
+  debug: var=_key_content
+  no_log: true
+  tags:
+  - never
+  - debug
+
+- name: "key {{ alias }} is present"
+  copy:
+    content: "{{ _key_content.stdout|default(_existing_key_content.stdout) }}"
+    dest: "{{ key_dir|default(tls_default_key_dir) }}/{{ alias }}.key"
+    force: false
+
+- name: verify key {{ alias }}
+  changed_when: false
+  no_log: true
+  command: openssl rsa -in {{ key_dir|default(tls_default_key_dir) }}/{{ alias }}.key
 
 ...

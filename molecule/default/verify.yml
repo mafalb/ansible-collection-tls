@@ -1,6 +1,82 @@
 # vim: set ft=yaml ts=2 expandtab:
 ---
 
+- name: Verify key on cluster
+  hosts: all
+  environment:
+    http_proxy: "{{ lookup('env', 'http_proxy') }}"
+    https_proxy: "{{ lookup('env', 'https_proxy') }}"
+    no_proxy: "{{ lookup('env', 'no_proxy') }}"
+
+  roles:
+
+  - name: mafalb.tls.cfg
+
+  tasks:
+
+  - assert:
+      that:
+      - ansible_play_hosts|length == 2
+
+  - name: create tmp directory
+    tempfile:
+      state: directory
+      prefix: tlskeys_cluster_
+    register: _tlskeys
+    run_once: true
+
+  - name: fetch key
+    fetch:
+      src: "{{ tls_default_key_dir }}/clusterkey.example.com.key"
+      dest: "{{ _tlskeys.path }}/{{ inventory_hostname }}"
+      flat: true
+
+  - name: diff keys
+    delegate_to: localhost
+    shell: diff -u *
+    changed_when: false
+    args:
+      chdir: "{{ _tlskeys.path }}"
+
+- name: Verify key on non cluster
+  hosts: all
+  environment:
+    http_proxy: "{{ lookup('env', 'http_proxy') }}"
+    https_proxy: "{{ lookup('env', 'https_proxy') }}"
+    no_proxy: "{{ lookup('env', 'no_proxy') }}"
+
+  roles:
+
+  - name: mafalb.tls.cfg
+
+  tasks:
+
+  - assert:
+      that:
+      - ansible_play_hosts|length == 2
+
+  - name: create tmp directory
+    tempfile:
+      state: directory
+      prefix: tlskeys_noncluster_
+    register: _tlskeys
+    run_once: true
+
+  - name: fetch key
+    fetch:
+      src: "{{ tls_default_key_dir }}/nonclusterkey.example.com.key"
+      dest: "{{ _tlskeys.path }}/{{ inventory_hostname }}"
+      flat: true
+
+  - name: diff keys
+    delegate_to: localhost
+    shell: diff -u *
+    changed_when: false
+    register: _diff
+    failed_when: _diff.rc == 0
+    args:
+      chdir: "{{ _tlskeys.path }}"
+
 - name: Verify key and csr
   hosts: all,!ca
   environment:
