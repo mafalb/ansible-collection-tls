@@ -58,7 +58,7 @@
   when:
   - _key_exists.rc != 0
   no_log: true
-  run_once: "{{ true if key_target_hosts is defined else false }}"
+  run_once: "{{ true if one_key_for_all|bool() else false }}"
   register: _key_content
 
 - name: debug _key_content

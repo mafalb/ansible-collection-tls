@@ -40,7 +40,7 @@
   roles:
   - role: mafalb.tls.key
     alias: clusterkey.example.com
-    key_target_hosts: "{{ ansible_play_hosts }}"
+    one_key_for_all: true
 
 - name: create keys on multiple hosts - no cluster
   hosts: all

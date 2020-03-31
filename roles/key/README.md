@@ -1,10 +1,5 @@
 # Ansible role - mafalb.tls.key
 
-|||
-|---|---|
-|master|![master branch](https://github.com/mafalb/ansible-collection-tls/workflows/CI/badge.svg)|
-|dev|![dev branch](https://github.com/mafalb/ansible-collection-tls/workflows/CI/badge.svg?branch=dev)|
-
 Role for creating a private TLS key. For now only RSA keys are supported.
 
 ### Basic Usage
@@ -60,15 +55,13 @@ will save the key into ```{{ key_dir}}/subdirectory/test.example.com.key```
 
 ---
 
-```key_target_hosts```
-
-```key_target_hosts: "{{ groups['cluster'] }}"```
+```one_key_for_all``` boolean, defaults to False
 
 ```yaml
-key_target_hosts:
-- node_a
-- node_b
+one_key_for_all: true
 ```
+
+Use this if you want the same key on all hosts in the play, e.g. if you have a cluster.
 
 ---
 
