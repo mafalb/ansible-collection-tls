@@ -93,6 +93,13 @@
     environment: "{{ proxy|default(omit) }}"
     register: _acme_cert
 
+  - name: debug acme cert {{ acme_alias }}
+    debug:
+      var: _acme_cert
+    tags:
+    - never
+    - debug
+
   - name: verify {{ acme_alias }}
     include_role:
       name: mafalb.tls.verify
