@@ -3,5 +3,6 @@
 
 key_type: RSA
 key_size: 2048
+one_key_for_all: false
 
 ...

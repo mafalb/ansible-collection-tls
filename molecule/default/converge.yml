@@ -3,6 +3,10 @@
 
 - name: dependencies
   hosts: all
+  environment:
+    http_proxy: "{{ lookup('env', 'http_proxy') }}"
+    https_proxy: "{{ lookup('env', 'https_proxy') }}"
+    no_proxy: "{{ lookup('env', 'no_proxy') }}"
   roles:
   - role: mafalb.ansible.node
   - role: mafalb.tls.cfg
@@ -30,6 +34,29 @@
     alias: key/blubb/test4.example.com-20200114
     key_dir: /tmp
 
+- name: create key for cluster
+  hosts: all
+  environment:
+    http_proxy: "{{ lookup('env', 'http_proxy') }}"
+    https_proxy: "{{ lookup('env', 'https_proxy') }}"
+    no_proxy: "{{ lookup('env', 'no_proxy') }}"
+
+  roles:
+  - role: mafalb.tls.key
+    alias: clusterkey.example.com
+    one_key_for_all: true
+
+- name: create keys on multiple hosts - no cluster
+  hosts: all
+  environment:
+    http_proxy: "{{ lookup('env', 'http_proxy') }}"
+    https_proxy: "{{ lookup('env', 'https_proxy') }}"
+    no_proxy: "{{ lookup('env', 'no_proxy') }}"
+
+  roles:
+
+  - role: mafalb.tls.key
+    alias: nonclusterkey.example.com
 
 - name: Converge csr
   hosts: all,!ca
