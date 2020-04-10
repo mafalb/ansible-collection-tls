@@ -83,6 +83,7 @@
   changed_when: false
   failed_when: false
   no_log: true
+  check_mode: false
   run_once: "{{ true if one_key_for_all|bool() else false }}"
   register: _key_data
 
