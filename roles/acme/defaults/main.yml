@@ -2,6 +2,8 @@
 ---
 
 tls_days_remaining: 30
+acme_remaining_days: 30
+acme_force: false
 now: "{{ '%Y%m%d'|strftime }}"
 acme_account_key: "{{ key_dir|default(tls_default_key_dir) }}/acme_account.key"
 acme_directory: https://acme-staging-v02.api.letsencrypt.org/directory
