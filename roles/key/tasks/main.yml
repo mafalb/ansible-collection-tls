@@ -1,6 +1,9 @@
 # vim: set ft=yaml ts=2 expandtab:
 ---
 
+- debug:
+    var: tls_default_key_dir
+
 - name: assertions
   assert:
     that:
@@ -23,11 +26,107 @@
     state: directory
     recurse: true
 
-- name: "{{ alias }} is present"
-  openssl_privatekey:
+- name: check if key does exist
+  stat:
     path: "{{ key_dir|default(tls_default_key_dir) }}/{{ alias }}.key"
-    size: "{{ key_size }}"
-    type: "{{ key_type }}"
-    backup: true
+  register: _key
+
+- name: debug _key
+  debug:
+    var: _key
+  tags:
+  - never
+  - debug
+
+- name: key does not yet exist
+  block:
+
+  - name: create tempfile for key {{ alias }}
+    tempfile:
+      state: file
+    register: _key_tempfile
+
+  - name: generate key {{ alias }}
+    openssl_privatekey:
+      path: "{{ _key_tempfile.path }}"
+      size: "{{ key_size }}"
+      type: "{{ key_type }}"
+      backup: true
+    register: _key_metadata
+
+  - name: debug _key_metadata
+    debug:
+      var: _key_metadata
+    tags:
+    - never
+    - debug
+
+  - name: get modulus {{ alias }}
+    command: openssl rsa -noout -modulus -in {{ _key_tempfile.path }}
+    changed_when: false
+    failed_when: false
+    run_once: "{{ true if one_key_for_all|bool() else false }}"
+    register: _key_modulus_1
+
+  - name: debug _key_modulus_1
+    debug:
+      var: _key_modulus_1
+    tags:
+    - never
+    - debug
+
+  when: not _key.stat.exists|bool()
+  run_once: "{{ true if one_key_for_all|bool() else false }}"
+
+- name: get key {{ alias }}
+  command: openssl rsa -in {{ _key_tempfile.path|default(key_dir|default(tls_default_key_dir) + '/' + alias + '.key') }}
+  changed_when: false
+  failed_when: false
+  no_log: true
+  check_mode: false
+  run_once: "{{ true if one_key_for_all|bool() else false }}"
+  register: _key_data
+
+- name: debug _key_data
+  debug:
+    var: _key_data
+  no_log: true
+  tags:
+  - never
+  - debug
+
+- name: get modulus {{ alias }}
+  command: openssl rsa -noout -modulus -in {{ key_dir|default(tls_default_key_dir) }}/{{ alias }}.key
+  when: _key.stat.exists|bool()
+  changed_when: false
+  failed_when: false
+  run_once: "{{ true if one_key_for_all|bool() else false }}"
+  register: _key_modulus_2
+
+- name: debug _key_modulus_2
+  debug:
+    var: _key_modulus_2
+  tags:
+  - never
+  - debug
+
+- name: "key {{ alias }} is present"
+  copy:
+    content: "{{ _key_data.stdout }}\n"
+    dest: "{{ key_dir|default(tls_default_key_dir) }}/{{ alias }}.key"
+    force: false
+    mode: "0640"
+  when: not _key.stat.exists|bool()
+  no_log: true
+
+- name: get modulus {{ alias }} a second time
+  command: openssl rsa -noout -modulus -in {{ key_dir|default(tls_default_key_dir) }}/{{ alias }}.key
+  changed_when: false
+  register: _key_modulus_after
+
+- name: verify modulus key {{ alias }}
+  assert:
+    that:
+    - _key_modulus_1.stdout|default(_key_modulus_2.stdout) == _key_modulus_after.stdout
 
 ...

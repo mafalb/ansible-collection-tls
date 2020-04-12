@@ -2,7 +2,7 @@
 ---
 
 - debug:
-    var: tls_days_remaining * 86400
+    var: acme_remaining_days * 86400
   tags:
   - never
   - debug
@@ -21,7 +21,7 @@
   changed_when: false
   failed_when: false
   check_mode: false
-  command: openssl x509 -noout -in {{ cert_dir|default(tls_default_cert_dir) }}/{{ acme_alias }}.cert -checkend {{ tls_days_remaining * 86400 }}
+  command: openssl x509 -noout -in {{ cert_dir|default(tls_default_cert_dir) }}/{{ acme_alias }}.cert -checkend {{ acme_remaining_days * 86400 }}
   register: _need_renew
 
 - debug:
@@ -59,7 +59,7 @@
       modify_account: false
       csr: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ acme_alias }}-{{ now }}.csr"
       retrieve_all_alternates: true
-      dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ acme_alias }}.cert"
+      dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ acme_alias }}-{{ now }}.cert"
     register: _acme_challenge
     environment: "{{ proxy|default(omit) }}"
 
@@ -84,6 +84,8 @@
       acme_directory: "{{ acme_directory }}"
       account_key_src: "{{ acme_account_key }}"
       modify_account: false
+      remaining_days: "{{ acme_remaining_days }}"
+      force: "{{ acme_force }}"
       csr: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ acme_alias }}-{{ now }}.csr"
       dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ acme_alias }}-{{ now }}.cert"
       fullchain_dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ acme_alias }}-{{ now }}.fullchain.pem"
@@ -92,6 +94,13 @@
       data: "{{ _acme_challenge }}"
     environment: "{{ proxy|default(omit) }}"
     register: _acme_cert
+
+  - name: debug acme cert {{ acme_alias }}
+    debug:
+      var: _acme_cert
+    tags:
+    - never
+    - debug
 
   - name: verify {{ acme_alias }}
     include_role:
