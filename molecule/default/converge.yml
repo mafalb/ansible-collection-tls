@@ -9,6 +9,8 @@
     no_proxy: "{{ lookup('env', 'no_proxy') }}"
   roles:
   - role: mafalb.ansible.node
+    ansible_node_features:
+    - crypto
   - role: mafalb.tls.cfg
 
 - name: create key

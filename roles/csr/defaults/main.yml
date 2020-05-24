@@ -4,5 +4,6 @@
 ca: false
 x509_extended_key_usage:
 - serverAuth
+one_key_for_all: false
 
 ...

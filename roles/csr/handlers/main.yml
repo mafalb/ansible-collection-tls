@@ -1,0 +1,8 @@
+# vim: set ft=yaml ts=2 expandtab:
+---
+
+- name: print CSR
+  debug:
+    var: _csr.stdout
+
+...

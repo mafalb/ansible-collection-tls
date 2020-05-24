@@ -50,6 +50,7 @@
     path: "{{ csr_dir|default(tls_default_cert_dir) }}/{{ alias|dirname }}"
     state: directory
     recurse: true
+  run_once: "{{ true if one_key_for_all|bool() else false }}"
 
 - name: config for {{ alias }} is present
   with_first_found:
@@ -62,12 +63,16 @@
 - name: CSR for {{ alias }} is present (existing will be overwritten)
   when: csr_overwrite is defined
   command: openssl req -new -utf8 -key {{ key_dir|default(tls_default_key_dir) + '/' + key_file|default(alias + '.key') }} -out {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr -config {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.cnf # noqa 204
+  run_once: "{{ true if one_key_for_all|bool() else false }}"
+  notify: print CSR
 
 - name: CSR for {{ alias }} is present
   when: csr_overwrite is not defined
   command: openssl req -new -utf8 -key {{ key_dir|default(tls_default_key_dir) + '/' + key_file|default(alias + '.key') }} -out {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr -config {{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.cnf # noqa 204
   args:
     creates: "{{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr"
+  run_once: "{{ true if one_key_for_all|bool() else false }}"
+  notify: print CSR
 
 - name: CSR matches key
   include_role:
@@ -75,5 +80,6 @@
   vars:
     csr: "{{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr"
     key: "{{ key_dir|default(tls_default_key_dir) + '/' + key_file|default(alias + '.key') }}"
+  run_once: "{{ true if one_key_for_all|bool() else false }}"
 
 ...
