@@ -26,8 +26,9 @@ jobs:
         - centos_6
         - ubuntu_1804
         - ubuntu_1604
+        - ubuntu_2004
         - fedora_31
-        - fedora_30
+        - fedora_32
 
         include:
 
@@ -51,13 +52,17 @@ jobs:
           distribution: ubuntu
           version: xenial
 
+        - target: ubuntu_2004
+          distribution: ubuntu
+          version: focal
+
         - target: fedora_31
           distribution: fedora
           version: 31
 
-        - target: fedora_30
+        - target: fedora_32
           distribution: fedora
-          version: 30
+          version: 32
 
     env:
       CI_CONTAINER_IMAGE: ${{ matrix.distribution }}
