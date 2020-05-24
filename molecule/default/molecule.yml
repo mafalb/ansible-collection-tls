@@ -12,6 +12,8 @@ lint: |
   yamllint .
   ansible-lint -v
   ansible-lint -v roles/*/vars/*.yml
+  find roles -maxdepth 1 -mindepth 1 -type d -exec ls {}/README.md \;
+  tests/check-README.sh
   flake8 -v
 
 platforms:
