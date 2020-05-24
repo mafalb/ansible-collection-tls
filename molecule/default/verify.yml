@@ -61,6 +61,7 @@
       - ansible_play_hosts|length == 2
 
   - name: create tmp directory
+    delegate_to: localhost
     tempfile:
       state: directory
       prefix: tlskeys_noncluster_
