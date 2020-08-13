@@ -31,8 +31,8 @@
     dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.cert"
     mode: 00644
     backup: true
-
   notify: check for changed cert
+
 - block:
 
   - name: CA certificates for {{ alias }} does exist
