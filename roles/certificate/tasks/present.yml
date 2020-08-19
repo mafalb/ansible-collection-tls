@@ -150,7 +150,7 @@
     check_mode: false
 
   - name: get modulus of key for {{ alias }}
-    command: openssl rsa -modulus -in {{ private_dir|default(tls_default_key_dir + '/' + alias + '.key') }}  -noout
+    command: openssl rsa -modulus -in {{ private_dir|default(tls_default_key_dir) }}/{{ alias }}.key -noout
     register: _key_modulus
     changed_when: false
     check_mode: false
