@@ -8,10 +8,11 @@ driver:
 
 lint: |
   set -e
+  PATH=${PATH}
   ! grep -r "no_log: false" .
   yamllint .
-  ansible-lint -v
-  ansible-lint -v roles/*/vars/*.yml
+  ansible-lint -v -x 208
+  ansible-lint -v -x 208 roles/*/vars/*.yml
   find roles -maxdepth 1 -mindepth 1 -type d -exec ls {}/README.md \;
   tests/check-README.sh
   flake8 -v
