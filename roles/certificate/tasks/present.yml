@@ -81,15 +81,15 @@
   - name: key for {{ alias }} does exist
     copy:
       remote_src: true
-      src: "{{ private_dir|default(tls_default_key_dir) }}/{{ remote_key|default(key) }}"
-      dest: "{{ private_dir|default(tls_default_key_dir) }}/{{ alias }}.key"
+      src: "{{ key_dir|default(tls_default_key_dir) }}/{{ remote_key|default(key) }}"
+      dest: "{{ key_dir|default(tls_default_key_dir) }}/{{ alias }}.key"
       backup: true
       mode: "{{ tls_key_mode }}"
     notify: check for changed key
 
   - name: read in {{ key }}
     no_log: true
-    command: cat "{{ private_dir|default(tls_default_key_dir) }}/{{ key|default(remote_key) }}"
+    command: cat "{{ key_dir|default(tls_default_key_dir) }}/{{ key|default(remote_key) }}"
     check_mode: false
     changed_when: false
     register: __key
@@ -121,7 +121,7 @@
   no_log: true
   template:
     src: pem.j2
-    dest: "{{ private_dir|default(tls_default_key_dir) }}/{{ alias }}.pem"
+    dest: "{{ key_dir|default(tls_default_key_dir) }}/{{ alias }}.pem"
     mode: "{{ tls_key_mode }}"
     backup: true
   notify: check for changed private pem
@@ -150,7 +150,7 @@
     check_mode: false
 
   - name: get modulus of key for {{ alias }}
-    command: openssl rsa -modulus -in {{ private_dir|default(tls_default_key_dir) }}/{{ alias }}.key -noout
+    command: openssl rsa -modulus -in {{ key_dir|default(tls_default_key_dir) }}/{{ alias }}.key -noout
     register: _key_modulus
     changed_when: false
     check_mode: false

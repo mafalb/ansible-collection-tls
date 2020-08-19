@@ -1,4 +1,4 @@
-# Ansible role - mafalb.tls.csr
+# Ansible role - mafalb.tls.certificate
 
 Role for copying a certificate to a remote machine 
 
@@ -61,7 +61,7 @@ x509_extended_key_usage:
 - clientAuth
 - ...
 ```
+
 ## License
 
 GPLv3
-
