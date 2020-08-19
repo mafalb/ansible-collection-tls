@@ -36,7 +36,9 @@
 - block:
 
   - name: CA certificates for {{ alias }} does exist
-    when: root is defined
+    when:
+    - root is defined
+    - root|length > 1
     loop: "{{ root }}"
     copy:
       src: "{{ playbook_dir }}/{{ item }}"
@@ -52,6 +54,8 @@
       dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.root.pem"
       backup: true
 
+  # root.cert changed to root.pem
+  #
   - name: "{{ alias }}.root.cert is absent"
     when: root is defined
     file:
