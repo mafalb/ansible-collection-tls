@@ -191,12 +191,14 @@
     file:
       path: /tmp/signing_ca_1/{{ ansible_hostname }}
       state: directory
+      mode: go+rx
 
   - name: copy the csr to CA
     delegate_to: t_CA
     copy:
       src: files/testcert2/{{ ansible_hostname }}/test1.example.com-20200114.csr
       dest: /tmp/signing_ca_1/{{ ansible_hostname }}/
+      mode: go+r
 
   - name: test1.example.com cert is present
     delegate_to: t_CA

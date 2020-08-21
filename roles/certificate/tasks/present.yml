@@ -19,7 +19,7 @@
   copy:
     src: "{{ playbook_dir }}/{{ cert }}"
     dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.cert"
-    mode: 00644
+    mode: go+r
     backup: true
   notify: check for changed cert
 
@@ -29,7 +29,7 @@
     remote_src: true
     src: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ remote_cert }}"
     dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.cert"
-    mode: 00644
+    mode: go+r
     backup: true
   notify: check for changed cert
 
@@ -43,6 +43,7 @@
     copy:
       src: "{{ playbook_dir }}/{{ item }}"
       dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.root{{ i + 1 }}.cert"
+      mode: go+r
       backup: true
     loop_control:
       index_var: i
@@ -52,6 +53,7 @@
     template:
       src: root.j2
       dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.root.pem"
+      mode: go+r
       backup: true
 
   # root.cert changed to root.pem
@@ -68,6 +70,7 @@
     copy:
       src: "{{ item }}"
       dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ (item|basename|splitext)[0] }}.cert"
+      mode: go+r
 
 - debug: var=key|default(remote_key)
   no_log: true
@@ -130,6 +133,7 @@
   template:
     src: chain.j2
     dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.chain.pem"
+    mode: "00444"
     backup: true
   notify: check for changed chain
 
@@ -137,6 +141,7 @@
   template:
     src: fullchain.j2
     dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.fullchain.pem"
+    mode: "00444"
     backup: true
   notify: check for changed chain
 

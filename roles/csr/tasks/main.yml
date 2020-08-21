@@ -49,7 +49,7 @@
   file:
     path: "{{ csr_dir|default(tls_default_cert_dir) }}/{{ alias|dirname }}"
     state: directory
-    recurse: true
+    mode: go+r
   run_once: "{{ true if one_key_for_all|bool() else false }}"
 
 - name: config for {{ alias }} is present
@@ -59,6 +59,7 @@
   template:
     src: "{{ item }}"
     dest: "{{ csr_dir|default(tls_default_cert_dir) }}/{{ alias }}.cnf"
+    mode: go+r
 
 - name: CSR for {{ alias }} is present (existing will be overwritten)
   when: csr_overwrite is defined
