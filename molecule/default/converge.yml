@@ -169,6 +169,7 @@
       ownca_privatekey_path: /tmp/signing_ca_1/signing_ca_1.key
       provider: ownca
       ownca_not_after: +825d
+      mode: 0644
 
 
 - name: test1.example.com
@@ -209,6 +210,7 @@
       ownca_privatekey_path: /tmp/signing_ca_1/signing_ca_1.key
       provider: ownca
       ownca_not_after: +825d
+      mode: 0644
 
 - name: Converge test1.example.com
   hosts: all,!ca
