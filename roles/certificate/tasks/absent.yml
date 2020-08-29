@@ -6,8 +6,8 @@
   - "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.cert"
   - "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.chain.pem"
   - "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.root.pem"
-  - "{{ private_dir|default(tls_default_key_dir) }}/{{ alias }}.key"
-  - "{{ private_dir|default(tls_default_key_dir) }}/{{ alias }}.pem }}"
+  - "{{ key_dir|default(tls_default_key_dir) }}/{{ alias }}.key"
+  - "{{ key_dir|default(tls_default_key_dir) }}/{{ alias }}.pem }}"
   - "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr"
   - "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.cnf"
   file:
