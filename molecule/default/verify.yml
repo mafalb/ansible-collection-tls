@@ -31,6 +31,10 @@
   - name: debug tls_default_key dir
     debug: var=tls_default_key_dir
 
+  - name: stat cluster key
+    stat:
+      path: "{{ tls_default_key_dir }}/clusterkey.example.com.key"
+
   - name: fetch cluster key
     fetch:
       src: "{{ tls_default_key_dir }}/clusterkey.example.com.key"
@@ -72,6 +76,10 @@
 
   - name: debug tls_default_key dir
     debug: var=tls_default_key_dir
+
+  - name: stat non cluster key
+    stat:
+      path: "{{ tls_default_key_dir }}/clusterkey.example.com.key"
 
   - name: fetch non cluster key
     fetch:
