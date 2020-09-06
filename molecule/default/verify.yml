@@ -19,7 +19,6 @@
       that:
       - ansible_play_hosts|length == 2
 
-  - debug: var=tls_default_key_dir
 
   - name: create tmp directory
     delegate_to: localhost
@@ -28,6 +27,8 @@
       prefix: tlskeys_cluster_
     register: _tlskeys
     run_once: true
+
+  - debug: var=tls_default_key_dir
 
   - name: fetch key
     fetch:
@@ -67,6 +68,8 @@
       prefix: tlskeys_noncluster_
     register: _tlskeys
     run_once: true
+
+  - debug: var=tls_default_key_dir
 
   - name: fetch key
     fetch:
