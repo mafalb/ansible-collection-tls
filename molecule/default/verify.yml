@@ -28,9 +28,10 @@
     register: _tlskeys
     run_once: true
 
-  - debug: var=tls_default_key_dir
+  - name: debug tls_default_key dir
+    debug: var=tls_default_key_dir
 
-  - name: fetch key
+  - name: fetch cluster key
     fetch:
       src: "{{ tls_default_key_dir }}/clusterkey.example.com.key"
       dest: "{{ _tlskeys.path }}/{{ inventory_hostname }}"
@@ -69,9 +70,10 @@
     register: _tlskeys
     run_once: true
 
-  - debug: var=tls_default_key_dir
+  - name: debug tls_default_key dir
+    debug: var=tls_default_key_dir
 
-  - name: fetch key
+  - name: fetch non cluster key
     fetch:
       src: "{{ tls_default_key_dir }}/nonclusterkey.example.com.key"
       dest: "{{ _tlskeys.path }}/{{ inventory_hostname }}"
