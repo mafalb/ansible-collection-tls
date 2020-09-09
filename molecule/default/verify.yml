@@ -79,7 +79,7 @@
 
   - name: stat non cluster key
     stat:
-      path: "{{ tls_default_key_dir }}/clusterkey.example.com.key"
+      path: "{{ tls_default_key_dir }}/nonclusterkey.example.com.key"
 
   - name: fetch non cluster key
     fetch:
