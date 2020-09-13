@@ -12,7 +12,7 @@ on:
 jobs:
   tls:
 
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
 
     strategy:
 
@@ -69,10 +69,14 @@ jobs:
       CI_CONTAINER_TAG: ${{ matrix.version }}
       CI_CONTAINER_PRIVILEGED: true
 
+    defaults:
+      run:
+        working-directory: ansible_collections/mafalb/tls
+
     steps:
 
       - name: checkout collection
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
         with:
           path: ansible_collections/mafalb/tls
       
