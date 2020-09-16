@@ -121,6 +121,7 @@
   register: _tls_cert
 
 - name: "{{ alias }}.pem is present"
+  when: "'privatepem' in tls_certificate_types"
   no_log: true
   template:
     src: pem.j2
