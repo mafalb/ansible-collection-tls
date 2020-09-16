@@ -157,6 +157,22 @@
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
     no_proxy: "{{ lookup('env', 'no_proxy') }}"
 
+  pre_tasks:
+
+  - name: check key in privatepem
+    loop:
+    - test1_1.example.com.pem
+    - test1.example.com.pem
+    changed_when: false
+    command: openssl rsa -in {{ tls_default_key_dir }}/{{ item }}
+
+  - name: check absence of privatepem
+    loop:
+    - test1_2.example.com.pem
+    - test1_3.example.com.pem
+    changed_when: false
+    command: test ! -f {{ tls_default_key_dir }}/{{ item }}
+
   roles:
 
   - name: verify test1_3.example.com

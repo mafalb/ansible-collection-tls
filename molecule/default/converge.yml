@@ -260,6 +260,8 @@
     - test1.example.com.chain.pem
     root:
     - files/testcert1/{{ ansible_hostname }}/root_ca_1.cert
+    tls_file_layouts:
+    - singlekey
 
   - role: mafalb.tls.certificate
     alias: test1_3.example.com
@@ -270,5 +272,7 @@
     root:
     - files/testcert1/{{ ansible_hostname }}/root_ca_1.cert
     state: present
+    tls_file_layouts:
+    - singlekey
 
 ...
