@@ -2,7 +2,7 @@
 ---
 
 tls_key_mode: 00600
-tls_certificate_types:
+tls_file_layouts:
 - singlekey
 - privatepem
 

@@ -1,6 +1,10 @@
 # Changelog
 
-## v0.0.6 XXXX-XX-XX
+## v0.1.0 XXXX-XX-XX
+
+### Added
+
+- tls_file_layouts config variable
 
 ### Changes to CI
 

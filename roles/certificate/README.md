@@ -54,10 +54,10 @@ In this case the existing file ```{{ key_dir }}/{{ key_alias }}.key``` is copied
 
 ```key_alias``` the key is expected to already exist in the file ```{{ key_dir }}/{{ key_alias }}.key``` and is copied to ```{{ key_dir }}/{{ alias }}.key``` which happens on the key node.
 
-### tls_cert_layouts
+### tls_file_layouts
 
 ```yaml
-tls_cert_layouts:
+tls_file_layouts:
 - singlekey             # cert, key and chain in separate files
 - privatepem            # cert, key and chain in one file
 ```
