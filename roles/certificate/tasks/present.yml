@@ -19,7 +19,7 @@
   copy:
     src: "{{ playbook_dir }}/{{ cert }}"
     dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.cert"
-    mode: 00644
+    mode: go+r
     backup: true
   notify: check for changed cert
 
@@ -29,7 +29,7 @@
     remote_src: true
     src: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ remote_cert }}"
     dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.cert"
-    mode: 00644
+    mode: go+r
     backup: true
   notify: check for changed cert
 
@@ -43,6 +43,7 @@
     copy:
       src: "{{ playbook_dir }}/{{ item }}"
       dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.root{{ i + 1 }}.cert"
+      mode: go+r
       backup: true
     loop_control:
       index_var: i
@@ -52,6 +53,7 @@
     template:
       src: root.j2
       dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.root.pem"
+      mode: go+r
       backup: true
 
   # root.cert changed to root.pem
@@ -68,6 +70,7 @@
     copy:
       src: "{{ item }}"
       dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ (item|basename|splitext)[0] }}.cert"
+      mode: go+r
 
 - debug: var=key|default(remote_key)
   no_log: true
@@ -81,15 +84,15 @@
   - name: key for {{ alias }} does exist
     copy:
       remote_src: true
-      src: "{{ private_dir|default(tls_default_key_dir) }}/{{ remote_key|default(key) }}"
-      dest: "{{ private_dir|default(tls_default_key_dir) }}/{{ alias }}.key"
+      src: "{{ key_dir|default(tls_default_key_dir) }}/{{ remote_key|default(key) }}"
+      dest: "{{ key_dir|default(tls_default_key_dir) }}/{{ alias }}.key"
       backup: true
       mode: "{{ tls_key_mode }}"
     notify: check for changed key
 
   - name: read in {{ key }}
     no_log: true
-    command: cat "{{ private_dir|default(tls_default_key_dir) }}/{{ key|default(remote_key) }}"
+    command: cat "{{ key_dir|default(tls_default_key_dir) }}/{{ key|default(remote_key) }}"
     check_mode: false
     changed_when: false
     register: __key
@@ -121,7 +124,7 @@
   no_log: true
   template:
     src: pem.j2
-    dest: "{{ private_dir|default(tls_default_key_dir) }}/{{ alias }}.pem"
+    dest: "{{ key_dir|default(tls_default_key_dir) }}/{{ alias }}.pem"
     mode: "{{ tls_key_mode }}"
     backup: true
   notify: check for changed private pem
@@ -130,6 +133,7 @@
   template:
     src: chain.j2
     dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.chain.pem"
+    mode: "00444"
     backup: true
   notify: check for changed chain
 
@@ -137,6 +141,7 @@
   template:
     src: fullchain.j2
     dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.fullchain.pem"
+    mode: "00444"
     backup: true
   notify: check for changed chain
 
@@ -150,7 +155,7 @@
     check_mode: false
 
   - name: get modulus of key for {{ alias }}
-    command: openssl rsa -modulus -in {{ private_dir|default(tls_default_key_dir + '/' + alias + '.key') }}  -noout
+    command: openssl rsa -modulus -in {{ key_dir|default(tls_default_key_dir) }}/{{ alias }}.key -noout
     register: _key_modulus
     changed_when: false
     check_mode: false

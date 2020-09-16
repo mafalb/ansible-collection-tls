@@ -26,6 +26,7 @@
     csr_path: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr"
     provider: selfsigned
     selfsigned_not_after: +{{ ca_days }}d
+    mode: 0644
 
 - name: Intermediate certificate is present
   when: signing_key is defined
@@ -36,6 +37,7 @@
     csr_path: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.csr"
     provider: ownca
     ownca_not_after: +{{ ca_days }}d
+    mode: 0644
 
 - name: Get information on generated certificate
   openssl_certificate_info:

@@ -1,4 +1,4 @@
-# Ansible role - mafalb.tls.csr
+# Ansible role - mafalb.tls.certificate
 
 Role for deplying a certificate on a remote machine. There are many files involved. You need the certificate, you need the matching private key and you need the root. Maybe you need the certificate in multiple variations. Some software does expect the certificate and the corresponding private key in separate files, some software expect the certificate and the key in the same file (in pem format). This role does all of that for you.
 

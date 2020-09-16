@@ -24,7 +24,7 @@
   file:
     path: "{{ key_dir|default(tls_default_key_dir) }}/{{ alias|dirname }}"
     state: directory
-    recurse: true
+    mode: u+rx
 
 - name: check if key does exist
   stat:

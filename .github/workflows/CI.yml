@@ -12,7 +12,7 @@ on:
 jobs:
   tls:
 
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
 
     strategy:
 
@@ -69,10 +69,14 @@ jobs:
       CI_CONTAINER_TAG: ${{ matrix.version }}
       CI_CONTAINER_PRIVILEGED: true
 
+    defaults:
+      run:
+        working-directory: ansible_collections/mafalb/tls
+
     steps:
 
       - name: checkout collection
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
         with:
           path: ansible_collections/mafalb/tls
       
@@ -99,6 +103,6 @@ jobs:
       - name: run molecule tests
         run: |
           source ~/.virtualenvs/molecule/bin/activate 
-          PY_COLORS=1 CI_CONTAINER_PRIVILEGED=$CI_CONTAINER_PRIVILEGED CI_CONTAINER_IMAGE=$CI_CONTAINER_IMAGE CI_CONTAINER_TAG=$CI_CONTAINER_TAG molecule test
+          PY_COLORS=1 CI_CONTAINER_PRIVILEGED=$CI_CONTAINER_PRIVILEGED CI_CONTAINER_IMAGE=$CI_CONTAINER_IMAGE CI_CONTAINER_TAG=$CI_CONTAINER_TAG molecule --debug test
 
 ...
