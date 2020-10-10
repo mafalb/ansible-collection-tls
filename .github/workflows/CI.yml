@@ -5,7 +5,7 @@ name: CI
 
 on: 
   push:
-  pull_request:  
+  pull:
   schedule:
   - cron: '40 12 * * 6'
 
@@ -29,6 +29,10 @@ jobs:
         - ubuntu_2004
         - fedora_31
         - fedora_32
+
+        ansible_version:
+        - '2.10'
+        - '2.9'
 
         include:
 
@@ -68,6 +72,7 @@ jobs:
       CI_CONTAINER_IMAGE: ${{ matrix.distribution }}
       CI_CONTAINER_TAG: ${{ matrix.version }}
       CI_CONTAINER_PRIVILEGED: true
+      ANSIBLE_VERSION: ${{ matrix.ansible_version }}
 
     defaults:
       run:
@@ -94,11 +99,14 @@ jobs:
           mkdir -p ~/.ansible/collections/ansible_collections/mafalb
           mv ansible_collections/mafalb/ansible ~/.ansible/collections/ansible_collections/mafalb/
 
+      - name: update apt cache
+        run: sudo apt-get update
+
       - name: install dependencies
         run: ansible-galaxy collection install -r molecule/requirements.yml
 
       - name: install molecule
-        run: ansible-playbook -D molecule/install_molecule.yml
+        run: ansible-playbook -D molecule/install_molecule.yml -e molecule_ansible_version=${{ matrix.ansible_version }}
 
       - name: run molecule tests
         run: |
