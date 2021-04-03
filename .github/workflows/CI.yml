@@ -59,6 +59,7 @@ jobs:
           version: 32
 
     env:
+      ANSIBLE_VERSION: ${{ matrix.ansible_version }}
       CI_CONTAINER_IMAGE: ${{ matrix.distribution }}
       CI_CONTAINER_TAG: ${{ matrix.version }}
       CI_CONTAINER_PRIVILEGED: true
