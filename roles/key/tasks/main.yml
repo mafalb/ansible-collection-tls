@@ -47,12 +47,20 @@
     register: _key_tempfile
 
   - name: generate key {{ alias }}
+    when: src is not defined
     openssl_privatekey:
       path: "{{ _key_tempfile.path }}"
       size: "{{ key_size }}"
       type: "{{ key_type }}"
       backup: true
     register: _key_metadata
+
+  - name: copy key to tempfile
+    when: src is defined
+    copy:
+      src: "{{ src }}"
+      dest: "{{ _key_tempfile.path }}"
+      mode: "{{ key_mode }}"
 
   - name: debug _key_metadata
     debug:
