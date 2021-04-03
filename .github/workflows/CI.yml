@@ -28,6 +28,10 @@ jobs:
         - ubuntu_2004
         - fedora_32
 
+        ansible_version:
+        - '2.10'
+        - '2.9'
+
         include:
 
         - target: centos_7
