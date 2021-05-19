@@ -1,4 +1,4 @@
-{% __cert %}
+{{ __cert.stdout }}
 {% if chain is defined %}
 {% for cacert in chain %}
 {{ lookup('file', playbook_dir + '/' + cacert) }}
