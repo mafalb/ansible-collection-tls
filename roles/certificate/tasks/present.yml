@@ -13,6 +13,7 @@
       - not (cert is defined and remote_cert is defined)
       - key is defined or remote_key is defined
       - not (key is defined and remote_key is defined)
+      - tls_file_layouts|type_debug == 'list'
 
 - name: "{{ alias }}.cert is present"
   when: cert is defined
@@ -32,6 +33,13 @@
     mode: go+r
     backup: true
   notify: check for changed cert
+
+- name: read in certificate
+  no_log: true
+  command: cat "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.cert"
+  check_mode: false
+  changed_when: false
+  register: __cert
 
 - block:
 
@@ -72,7 +80,8 @@
       dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ (item|basename|splitext)[0] }}.cert"
       mode: go+r
 
-- debug: var=key|default(remote_key)
+- name: debug
+  debug: var=key|default(remote_key)
   no_log: true
   tags:
   - never
@@ -106,7 +115,8 @@
     src: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ item }}"
   register: __chain
 
-- debug:
+- name: debug
+  debug:
     var: __chain
   tags:
   - never
@@ -121,6 +131,7 @@
   register: _tls_cert
 
 - name: "{{ alias }}.pem is present"
+  when: "'privatepem' in tls_file_layouts"
   no_log: true
   template:
     src: pem.j2
@@ -133,6 +144,15 @@
   template:
     src: chain.j2
     dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.chain.pem"
+    mode: "00444"
+    backup: true
+  notify: check for changed chain
+
+- name: "{{ alias }}.cert+chain.pem is present"
+  when: "'cert+chain' in tls_file_layouts"
+  template:
+    src: cert+chain.j2
+    dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.cert+chain.pem"
     mode: "00444"
     backup: true
   notify: check for changed chain

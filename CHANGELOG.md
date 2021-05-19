@@ -1,6 +1,13 @@
 # Changelog
 
-## v0.0.6 XXXX-XX-XX
+## v0.1.0 2021-05-19
+
+- added a tls_file_layout cert+chain
+- CI improvements, updates for molecule and ansible-lint
+
+### Added
+
+- tls_file_layouts config variable
 
 ### Changes to CI
 

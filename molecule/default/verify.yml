@@ -19,7 +19,6 @@
       that:
       - ansible_play_hosts|length == 2
 
-  - debug: var=tls_default_key_dir
 
   - name: create tmp directory
     delegate_to: localhost
@@ -29,7 +28,14 @@
     register: _tlskeys
     run_once: true
 
-  - name: fetch key
+  - name: debug tls_default_key dir
+    debug: var=tls_default_key_dir
+
+  - name: stat cluster key
+    stat:
+      path: "{{ tls_default_key_dir }}/clusterkey.example.com.key"
+
+  - name: fetch cluster key
     fetch:
       src: "{{ tls_default_key_dir }}/clusterkey.example.com.key"
       dest: "{{ _tlskeys.path }}/{{ inventory_hostname }}"
@@ -68,7 +74,14 @@
     register: _tlskeys
     run_once: true
 
-  - name: fetch key
+  - name: debug tls_default_key dir
+    debug: var=tls_default_key_dir
+
+  - name: stat non cluster key
+    stat:
+      path: "{{ tls_default_key_dir }}/nonclusterkey.example.com.key"
+
+  - name: fetch non cluster key
     fetch:
       src: "{{ tls_default_key_dir }}/nonclusterkey.example.com.key"
       dest: "{{ _tlskeys.path }}/{{ inventory_hostname }}"
@@ -143,6 +156,28 @@
     http_proxy: "{{ lookup('env', 'http_proxy') }}"
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
     no_proxy: "{{ lookup('env', 'no_proxy') }}"
+
+  pre_tasks:
+
+  - name: check key in privatepem
+    loop:
+    - test1_1.example.com.pem
+    - test1.example.com.pem
+    changed_when: false
+    command: openssl rsa -in {{ tls_default_key_dir }}/{{ item }}
+
+  - name: check absence of privatepem
+    loop:
+    - test1_2.example.com.pem
+    - test1_3.example.com.pem
+    changed_when: false
+    command: test ! -f {{ tls_default_key_dir }}/{{ item }}
+
+  - name: check presence of cert+chain
+    loop:
+    - test1_3.example.com.cert+chain.pem
+    changed_when: false
+    command: test ! -f {{ tls_default_key_dir }}/{{ item }}
 
   roles:
 

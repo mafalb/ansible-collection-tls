@@ -1,7 +1,8 @@
 # vim: set ft=yaml ts=2 expandtab:
 ---
 
-- debug:
+- name: debug
+  debug:
     var: acme_remaining_days * 86400
   tags:
   - never
@@ -24,7 +25,8 @@
   command: openssl x509 -noout -in {{ cert_dir|default(tls_default_cert_dir) }}/{{ acme_alias }}.cert -checkend {{ acme_remaining_days * 86400 }}
   register: _need_renew
 
-- debug:
+- name: debug
+  debug:
     var: _need_renew
   tags:
   - never
@@ -63,7 +65,8 @@
     register: _acme_challenge
     environment: "{{ proxy|default(omit) }}"
 
-  - debug:
+  - name: debug
+    debug:
       var: _acme_challenge
     tags:
     - never
@@ -110,7 +113,8 @@
       key: "{{ cert_dir|default(tls_default_key_dir) }}/{{ acme_alias }}-{{ now }}.key"
       cert: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ acme_alias }}-{{ now }}.cert"
 
-  - debug:
+  - name: debug
+    debug:
       var: _acme_cert
     tags:
     - never

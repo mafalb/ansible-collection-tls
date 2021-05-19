@@ -4,8 +4,13 @@
 name: CI
 
 on: 
+
   push:
-  pull_request:  
+    branches:
+    - '**'
+    tags-ignore:
+    - '*'
+
   schedule:
   - cron: '40 12 * * 6'
 
@@ -23,10 +28,13 @@ jobs:
         target:
         - centos_7
         - centos_8
-        - ubuntu_1804
         - ubuntu_1604
+        - ubuntu_1804
         - ubuntu_2004
-        - fedora_32
+        - fedora_33
+        - fedora_34
+        - debian9
+        - debian10
 
         ansible_version:
         - '2.10'
@@ -42,21 +50,33 @@ jobs:
           distribution: centos
           version: 8
 
-        - target: ubuntu_1804
-          distribution: ubuntu
-          version: bionic
-
         - target: ubuntu_1604
           distribution: ubuntu
           version: xenial
+
+        - target: ubuntu_1804
+          distribution: ubuntu
+          version: bionic
 
         - target: ubuntu_2004
           distribution: ubuntu
           version: focal
 
-        - target: fedora_32
+        - target: fedora_33
           distribution: fedora
-          version: 32
+          version: 33
+
+        - target: fedora_34
+          distribution: fedora
+          version: 34
+
+        - target: debian9
+          distribution: debian
+          version: stretch
+
+        - target: debian10
+          distribution: debian
+          version: buster
 
     env:
       ANSIBLE_VERSION: ${{ matrix.ansible_version }}
@@ -75,19 +95,20 @@ jobs:
         with:
           path: ansible_collections/mafalb/tls
       
-      - name: install system ansible
-        run: sudo apt install ansible
-
-      # note: this uses ansible-galaxy from preinstalled ansible (2.10)
+      # use the github actions ansible
       #
       - name: install mafalb.ansible
-        run: ansible-galaxy collection install -r molecule/requirements.yml
+        run: ansible-galaxy collection install mafalb.ansible
 
-      # note: this uses ansible-playbook from system ansible
+      # use the system ansible
       #
       - name: install molecule
-        run: /usr/bin/ansible-playbook -D ~/.ansible/collections/ansible_collections/mafalb/ansible/playbooks/molecule.yml -e molecule_ansible_version=$ANSIBLE_VERSION -t all,debug
+        run: |
+          sudo apt install ansible
+          /usr/bin/ansible-playbook -D ~/.ansible/collections/ansible_collections/mafalb/ansible/playbooks/molecule.yml -e molecule_ansible_version=$ANSIBLE_VERSION -t all,debug
 
+      # use our ansible
+      #
       - name: check ansible version
         run: |
           source ~/.virtualenvs/molecule/bin/activate
@@ -96,6 +117,6 @@ jobs:
       - name: run molecule tests
         run: |
           source ~/.virtualenvs/molecule/bin/activate 
-          PY_COLORS=1 CI_CONTAINER_PRIVILEGED=$CI_CONTAINER_PRIVILEGED CI_CONTAINER_IMAGE=$CI_CONTAINER_IMAGE CI_CONTAINER_TAG=$CI_CONTAINER_TAG molecule test
+          PY_COLORS=1 CI_CONTAINER_PRIVILEGED=$CI_CONTAINER_PRIVILEGED CI_CONTAINER_IMAGE=$CI_CONTAINER_IMAGE CI_CONTAINER_TAG=$CI_CONTAINER_TAG molecule --debug test
 
 ...
