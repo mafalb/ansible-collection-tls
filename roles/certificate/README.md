@@ -60,6 +60,7 @@ In this case the existing file ```{{ key_dir }}/{{ key_alias }}.key``` is copied
 tls_file_layouts:
 - singlekey             # cert, key and chain in separate files
 - privatepem            # cert, key and chain in one file
+- cert+chain            # cert and chain in one file
 ```
 
 singlekey:
@@ -74,6 +75,12 @@ privatepem:
 
 ```
 /etc/pki/tls/private/bla.example.com.pem
+```
+
+cert+chain:
+
+```
+/etc/pki/tls/certs/bla.example.com.cert+chain.pem
 ```
 
 ## License

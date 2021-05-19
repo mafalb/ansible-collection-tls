@@ -274,5 +274,6 @@
     state: present
     tls_file_layouts:
     - singlekey
+    - cert+chain
 
 ...

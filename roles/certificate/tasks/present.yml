@@ -34,6 +34,13 @@
     backup: true
   notify: check for changed cert
 
+- name: read in certificate
+  no_log: true
+  command: cat "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.cert"
+  check_mode: false
+  changed_when: false
+  register: __cert
+
 - block:
 
   - name: CA certificates for {{ alias }} does exist
@@ -137,6 +144,15 @@
   template:
     src: chain.j2
     dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.chain.pem"
+    mode: "00444"
+    backup: true
+  notify: check for changed chain
+
+- name: "{{ alias }}.cert+chain.pem is present"
+  when: "'cert+chain' in tls_file_layouts"
+  template:
+    src: cert+chain.j2
+    dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ alias }}.cert+chain.pem"
     mode: "00444"
     backup: true
   notify: check for changed chain

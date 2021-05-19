@@ -173,6 +173,12 @@
     changed_when: false
     command: test ! -f {{ tls_default_key_dir }}/{{ item }}
 
+  - name: check presence of cert+chain
+    loop:
+    - test1_3.example.com.cert+chain.pem
+    changed_when: false
+    command: test ! -f {{ tls_default_key_dir }}/{{ item }}
+
   roles:
 
   - name: verify test1_3.example.com
