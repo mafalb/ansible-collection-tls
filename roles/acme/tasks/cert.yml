@@ -30,7 +30,8 @@
   register: _acme_challenge
   environment: "{{ proxy|default(omit) }}"
 
-- debug:
+- name: debug
+  debug:
     var: _acme_challenge
   tags:
   - never

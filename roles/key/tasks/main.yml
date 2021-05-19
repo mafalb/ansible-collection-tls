@@ -1,7 +1,8 @@
 # vim: set ft=yaml ts=2 expandtab:
 ---
 
-- debug:
+- name: debug
+  debug:
     var: tls_default_key_dir
 
 - name: assertions
@@ -12,7 +13,8 @@
     - key_size is defined
     - key_type in ['RSA']
 
-- debug:
+- name: debug
+  debug:
     var: alias
   tags:
   - never

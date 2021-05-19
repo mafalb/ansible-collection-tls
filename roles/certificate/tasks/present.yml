@@ -73,7 +73,8 @@
       dest: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ (item|basename|splitext)[0] }}.cert"
       mode: go+r
 
-- debug: var=key|default(remote_key)
+- name: debug
+  debug: var=key|default(remote_key)
   no_log: true
   tags:
   - never
@@ -107,7 +108,8 @@
     src: "{{ cert_dir|default(tls_default_cert_dir) }}/{{ item }}"
   register: __chain
 
-- debug:
+- name: debug
+  debug:
     var: __chain
   tags:
   - never
