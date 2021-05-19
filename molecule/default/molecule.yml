@@ -3,17 +3,19 @@
 
 dependency:
   name: galaxy
+  options:
+    role-file: idontexist.yml   # avoid warning while running molecule
+    requirements-file: molecule/default/requirements.yml
+
 driver:
   name: docker
 
 lint: |
   set -e
-  PATH=${PATH}
   ! grep -r "no_log: false" .
   yamllint .
   ansible-lint -v
   ansible-lint -v roles/*/vars/*.yml
-  find roles -maxdepth 1 -mindepth 1 -type d -exec ls {}/README.md \;
   tests/check-README.sh
   flake8 -v
 
