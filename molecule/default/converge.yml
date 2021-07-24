@@ -276,4 +276,17 @@
     - singlekey
     - cert+chain
 
+  - role: mafalb.tls.certificate
+    alias: test1_4.example.com
+    remote_cert: test1.example.com.cert
+    remote_key: test1_1.example.com.key
+    remote_chain:
+    - test1.example.com.chain.pem
+    root:
+    - files/testcert1/{{ ansible_hostname }}/root_ca_1.cert
+    state: present
+    tls_file_layouts:
+    - singlekey
+    - cert+chain
+
 ...

@@ -188,7 +188,7 @@
     cert: "{{ tls_default_cert_dir }}/test1_3.example.com.cert"
 
   - role: mafalb.tls.certificate
-    alias: test1_3.example.com
+    alias: test1_4.example.com
     state: absent
 
   - name: verify test1.example.com
