@@ -38,12 +38,9 @@ provisioner:
   config_options:
     defaults:
       gathering: smart
+      interpreter_python: auto
   lint:
     name: ansible-lint
-  inventory:
-    host_vars:
-      t_CA:
-        ansible_python_interpreter: /usr/bin/python3
 
 verifier:
   name: ansible
