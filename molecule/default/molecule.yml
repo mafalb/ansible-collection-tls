@@ -35,6 +35,7 @@ provisioner:
   ansible_args:
     - --tags=all,debug
     - --diff
+    - -vvv
   config_options:
     defaults:
       gathering: smart
