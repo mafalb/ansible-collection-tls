@@ -117,7 +117,7 @@
     x509_country: AT
 
 - name: create CA
-  hosts: ci_group
+  hosts: all
   environment:
     http_proxy: "{{ lookup('env', 'http_proxy') }}"
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
