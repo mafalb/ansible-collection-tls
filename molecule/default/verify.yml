@@ -97,7 +97,7 @@
       chdir: "{{ _tlskeys.path }}"
 
 - name: Verify key and csr
-  hosts: all,!ca
+  hosts: ci_group
   environment:
     http_proxy: "{{ lookup('env', 'http_proxy') }}"
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
@@ -129,7 +129,7 @@
     key: /tmp/key/blubb/test4.example.com-20200114.key
 
 - name: Verify CA
-  hosts: all,!t_centos6
+  hosts: all
   environment:
     http_proxy: "{{ lookup('env', 'http_proxy') }}"
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
@@ -151,7 +151,7 @@
 
 
 - name: Verify test1.example.com
-  hosts: all,!ca
+  hosts: ci_group
   environment:
     http_proxy: "{{ lookup('env', 'http_proxy') }}"
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
@@ -212,7 +212,7 @@
 - name: Verify certificates
   # CentOS 6 is too old for the openssl_certificate_info module
   # cryptography is too old
-  hosts: all,!ca,!t_centos6
+  hosts: ci_group
   environment:
     http_proxy: "{{ lookup('env', 'http_proxy') }}"
     https_proxy: "{{ lookup('env', 'https_proxy') }}"

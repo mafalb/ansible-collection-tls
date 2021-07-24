@@ -14,7 +14,7 @@
   - role: mafalb.tls.cfg
 
 - name: create key
-  hosts: all,!ca
+  hosts: ci_group
   environment:
     http_proxy: "{{ lookup('env', 'http_proxy') }}"
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
@@ -61,7 +61,7 @@
     alias: nonclusterkey.example.com
 
 - name: Converge csr
-  hosts: all,!ca
+  hosts: ci_group
   environment:
     http_proxy: "{{ lookup('env', 'http_proxy') }}"
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
@@ -117,7 +117,7 @@
     x509_country: AT
 
 - name: create CA
-  hosts: all,!t_centos6
+  hosts: ci_group
   environment:
     http_proxy: "{{ lookup('env', 'http_proxy') }}"
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
@@ -153,7 +153,7 @@
 
 
 - name: test3.example.com
-  hosts: all,!ca,!t_centos6
+  hosts: ci_group
   environment:
     http_proxy: "{{ lookup('env', 'http_proxy') }}"
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
@@ -173,7 +173,7 @@
 
 
 - name: test1.example.com
-  hosts: all,!ca
+  hosts: ci_group
   environment:
     http_proxy: "{{ lookup('env', 'http_proxy') }}"
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
@@ -213,7 +213,7 @@
       mode: 0644
 
 - name: Converge test1.example.com
-  hosts: all,!ca
+  hosts: ci_group
   environment:
     http_proxy: "{{ lookup('env', 'http_proxy') }}"
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
