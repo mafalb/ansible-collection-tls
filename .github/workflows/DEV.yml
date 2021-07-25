@@ -26,6 +26,7 @@ jobs:
       matrix:
 
         target:
+        - fedora35
         - c9s
         - debian11
 
@@ -35,6 +36,9 @@ jobs:
         - '2.11'
 
         include:
+
+        - target: fedora35
+          image: quay.io/fedora/fedora:35-x86_64
 
         - target: c9s
           image: quay.io/centos/centos:stream9-development
