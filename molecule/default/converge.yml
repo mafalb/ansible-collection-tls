@@ -14,7 +14,7 @@
   - role: mafalb.tls.cfg
 
 - name: create key
-  hosts: all,!ca
+  hosts: ci_group
   environment:
     http_proxy: "{{ lookup('env', 'http_proxy') }}"
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
@@ -61,7 +61,7 @@
     alias: nonclusterkey.example.com
 
 - name: Converge csr
-  hosts: all,!ca
+  hosts: ci_group
   environment:
     http_proxy: "{{ lookup('env', 'http_proxy') }}"
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
@@ -117,7 +117,7 @@
     x509_country: AT
 
 - name: create CA
-  hosts: all,!t_centos6
+  hosts: all
   environment:
     http_proxy: "{{ lookup('env', 'http_proxy') }}"
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
@@ -153,7 +153,7 @@
 
 
 - name: test3.example.com
-  hosts: all,!ca,!t_centos6
+  hosts: ci_group
   environment:
     http_proxy: "{{ lookup('env', 'http_proxy') }}"
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
@@ -173,7 +173,7 @@
 
 
 - name: test1.example.com
-  hosts: all,!ca
+  hosts: ci_group
   environment:
     http_proxy: "{{ lookup('env', 'http_proxy') }}"
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
@@ -188,21 +188,21 @@
       dest: files/testcert2/{{ ansible_hostname }}/test1.example.com-20200114.csr
 
   - name: create per hostname directory
-    delegate_to: t_CA
+    delegate_to: ci-CA
     file:
       path: /tmp/signing_ca_1/{{ ansible_hostname }}
       state: directory
       mode: go+rx
 
   - name: copy the csr to CA
-    delegate_to: t_CA
+    delegate_to: ci-CA
     copy:
       src: files/testcert2/{{ ansible_hostname }}/test1.example.com-20200114.csr
       dest: /tmp/signing_ca_1/{{ ansible_hostname }}/
       mode: go+r
 
   - name: test1.example.com cert is present
-    delegate_to: t_CA
+    delegate_to: ci-CA
     openssl_certificate:
       path: /tmp/signing_ca_1/{{ ansible_hostname }}/test1.example.com.cert
       csr_path: /tmp/signing_ca_1/{{ ansible_hostname }}/test1.example.com-20200114.csr
@@ -213,7 +213,7 @@
       mode: 0644
 
 - name: Converge test1.example.com
-  hosts: all,!ca
+  hosts: ci_group
   environment:
     http_proxy: "{{ lookup('env', 'http_proxy') }}"
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
@@ -222,7 +222,7 @@
   pre_tasks:
 
   - name: fetch the certificate
-    delegate_to: t_CA
+    delegate_to: ci-CA
     loop:
     - /tmp/signing_ca_1/{{ ansible_hostname }}/test1.example.com.cert
     - /tmp/signing_ca_1/signing_ca_1.cert
@@ -265,6 +265,19 @@
 
   - role: mafalb.tls.certificate
     alias: test1_3.example.com
+    remote_cert: test1.example.com.cert
+    remote_key: test1_1.example.com.key
+    remote_chain:
+    - test1.example.com.chain.pem
+    root:
+    - files/testcert1/{{ ansible_hostname }}/root_ca_1.cert
+    state: present
+    tls_file_layouts:
+    - singlekey
+    - cert+chain
+
+  - role: mafalb.tls.certificate
+    alias: test1_4.example.com
     remote_cert: test1.example.com.cert
     remote_key: test1_1.example.com.key
     remote_chain:

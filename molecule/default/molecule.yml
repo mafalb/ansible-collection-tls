@@ -20,18 +20,15 @@ lint: |
   flake8 -v
 
 platforms:
-  - name: t_${CI_CONTAINER_IMAGE:-centos}${CI_CONTAINER_TAG:-7}
-    image: ${CI_CONTAINER_IMAGE:-centos}:${CI_CONTAINER_TAG:-7}
+  - name: ${CI_HOSTNAME-"ci-rocky8"}
+    image: ${CI_IMAGE:-"quay.io/rockylinux/rockylinux:8"}
     dockerfile: ${CI_DOCKERFILE:-Dockerfile.j2}
-  - name: t_CA
-    image: centos:8
     groups:
-    - ca
-
-#  - name: t_ubuntu20
-#    image: ubuntu:focal
-#  - name: t_rawhide
-#    image: fedora:rawhide
+    - ci_group
+  - name: ci-CA
+    image: quay.io/rockylinux/rockylinux:8
+    groups:
+    - ca_group
 
 provisioner:
   name: ansible
@@ -41,12 +38,9 @@ provisioner:
   config_options:
     defaults:
       gathering: smart
+      interpreter_python: auto
   lint:
     name: ansible-lint
-  inventory:
-    host_vars:
-      t_CA:
-        ansible_python_interpreter: /usr/bin/python3
 
 verifier:
   name: ansible

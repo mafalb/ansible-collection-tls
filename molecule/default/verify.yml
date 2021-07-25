@@ -40,6 +40,7 @@
       src: "{{ tls_default_key_dir }}/clusterkey.example.com.key"
       dest: "{{ _tlskeys.path }}/{{ inventory_hostname }}"
       flat: true
+    throttle: 1
 
   - name: diff keys
     delegate_to: localhost
@@ -86,6 +87,7 @@
       src: "{{ tls_default_key_dir }}/nonclusterkey.example.com.key"
       dest: "{{ _tlskeys.path }}/{{ inventory_hostname }}"
       flat: true
+    throttle: 1
 
   - name: diff keys
     delegate_to: localhost
@@ -97,7 +99,7 @@
       chdir: "{{ _tlskeys.path }}"
 
 - name: Verify key and csr
-  hosts: all,!ca
+  hosts: ci_group
   environment:
     http_proxy: "{{ lookup('env', 'http_proxy') }}"
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
@@ -129,7 +131,7 @@
     key: /tmp/key/blubb/test4.example.com-20200114.key
 
 - name: Verify CA
-  hosts: all,!t_centos6
+  hosts: all
   environment:
     http_proxy: "{{ lookup('env', 'http_proxy') }}"
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
@@ -151,7 +153,7 @@
 
 
 - name: Verify test1.example.com
-  hosts: all,!ca
+  hosts: ci_group
   environment:
     http_proxy: "{{ lookup('env', 'http_proxy') }}"
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
@@ -188,7 +190,7 @@
     cert: "{{ tls_default_cert_dir }}/test1_3.example.com.cert"
 
   - role: mafalb.tls.certificate
-    alias: test1_3.example.com
+    alias: test1_4.example.com
     state: absent
 
   - name: verify test1.example.com
@@ -212,7 +214,7 @@
 - name: Verify certificates
   # CentOS 6 is too old for the openssl_certificate_info module
   # cryptography is too old
-  hosts: all,!ca,!t_centos6
+  hosts: ci_group
   environment:
     http_proxy: "{{ lookup('env', 'http_proxy') }}"
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
