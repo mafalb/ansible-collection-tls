@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.1.1 2021-07-XX
+## v0.1.1 2021-07-25
 
 - support/workaround for Rocky os_family bug
 - CI: support for ubuntu 21.04
