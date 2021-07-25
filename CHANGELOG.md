@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.1.1 2021-07-XX
+
+- support/workaround for Rocky os_family bug
+- CI: support for ubuntu 21.04
+- CI: fixed race condition when fetching files
+
 ## v0.1.0 2021-05-19
 
 - added a tls_file_layout cert+chain

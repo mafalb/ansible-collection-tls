@@ -1,7 +1,7 @@
 # vim: set ft=yaml ts=2 expandtab:
 ---
 
-name: DEV
+name: UNSTABLE
 
 on: 
 
@@ -15,7 +15,8 @@ on:
   - cron: '40 12 * * 6'
 
 jobs:
-  tls:
+
+  UNSTABLE:
 
     runs-on: ubuntu-20.04
 
