@@ -40,6 +40,7 @@
       src: "{{ tls_default_key_dir }}/clusterkey.example.com.key"
       dest: "{{ _tlskeys.path }}/{{ inventory_hostname }}"
       flat: true
+    throttle: 1
 
   - name: diff keys
     delegate_to: localhost
@@ -86,6 +87,7 @@
       src: "{{ tls_default_key_dir }}/nonclusterkey.example.com.key"
       dest: "{{ _tlskeys.path }}/{{ inventory_hostname }}"
       flat: true
+    throttle: 1
 
   - name: diff keys
     delegate_to: localhost
