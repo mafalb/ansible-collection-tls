@@ -44,7 +44,13 @@ jobs:
           image: quay.io/centos/centos:stream9-development
 
         - target: debian11
-          image: docker.io/debian:testing
+          image: docker.io/debian:bullseye
+
+        - target: ubuntu2104
+          image: docker.io/ubuntu:hirsute
+
+        - target: ubuntu2110
+          image: docker.io/ubuntu:impish
 
     env:
       
