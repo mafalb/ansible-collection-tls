@@ -31,8 +31,6 @@ jobs:
         target:
         - fedora35
         - c9s
-        - debian11
-        - ubuntu2104
         - ubuntu2110
 
         ansible_version:
@@ -47,12 +45,6 @@ jobs:
 
         - target: c9s
           image: quay.io/centos/centos:stream9-development
-
-        - target: debian11
-          image: docker.io/debian:bullseye
-
-        - target: ubuntu2104
-          image: docker.io/ubuntu:hirsute
 
         - target: ubuntu2110
           image: docker.io/ubuntu:impish
