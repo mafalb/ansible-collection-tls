@@ -2,8 +2,6 @@
 ---
 
 collections:
-- type: git
-  version: f-python3_cryptography
-  name: https://github.com/mafalb/ansible-collection-ansible
+- name: mafalb.ansible
 
 ...
