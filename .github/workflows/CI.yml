@@ -26,61 +26,24 @@ jobs:
       matrix:
 
         target:
-        - fedora33
-        - fedora34
-        - c8s
-        - alma8
-        - rocky8
-        - centos7
-        - centos8
-        - debian9
-        - debian10
-        - ubuntu16
-        - ubuntu18
-        - ubuntu20
+          - fedora38
+          - c8s
+          - debian12
 
         ansible_version:
-        - '2.9'
-        - '2.10'
-        - '2.11'
+          - '2.14'
 
         include:
 
-        - target: fedora33
-          image: docker.io/fedora:33
-
-        - target: fedora34
-          image: docker.io/fedora:34
+        - target: fedora38
+          image: docker.io/fedora:38
 
         - target: c8s
-          image: quay.io/centos/centos:stream8
+          image: quay.io/centos/centos:stream
 
-        - target: alma8
-          image: quay.io/almalinux/almalinux:8
+        - target: debian12
+          image: docker.io/debian:bookworm
 
-        - target: rocky8
-          image: quay.io/rockylinux/rockylinux:8
-
-        - target: centos7
-          image: quay.io/centos/centos:7
-
-        - target: centos8
-          image: quay.io/centos/centos:8
-
-        - target: debian9
-          image: docker.io/debian:stretch
-
-        - target: debian10
-          image: docker.io/debian:buster
-
-        - target: ubuntu16
-          image: docker.io/ubuntu:xenial
-
-        - target: ubuntu18
-          image: docker.io/ubuntu:bionic
-
-        - target: ubuntu20
-          image: docker.io/ubuntu:focal
 
     env:
       
